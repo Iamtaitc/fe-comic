@@ -1,0 +1,217 @@
+/* src/styles/pagination.css */
+
+/* Enhanced pagination controls */
+.pagination-container {
+  @apply flex flex-col items-center gap-4 py-6;
+}
+
+.pagination-info {
+  @apply text-sm text-muted-foreground text-center;
+  @apply px-4 py-2 rounded-lg bg-muted/30;
+}
+
+.pagination-controls {
+  @apply flex items-center gap-1 flex-wrap justify-center;
+}
+
+/* Pagination buttons */
+.pagination-btn {
+  @apply relative overflow-hidden transition-all duration-200;
+  @apply hover:shadow-md hover:scale-105 active:scale-95;
+}
+
+.pagination-btn-current {
+  @apply shadow-lg shadow-primary/20 ring-2 ring-primary/30;
+  @apply bg-gradient-to-r from-primary to-primary/80;
+}
+
+.pagination-btn-current::before {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent;
+  @apply animate-pulse;
+}
+
+/* Arrow buttons */
+.pagination-arrow {
+  @apply flex items-center gap-1 px-3 py-2 rounded-md;
+  @apply border border-border hover:border-primary/50;
+  @apply transition-all duration-200;
+}
+
+.pagination-arrow:hover {
+  @apply bg-primary/5 transform translate-x-0.5;
+}
+
+.pagination-arrow:disabled {
+  @apply opacity-50 cursor-not-allowed;
+  @apply hover:bg-transparent hover:border-border hover:translate-x-0;
+}
+
+/* Page number buttons */
+.pagination-page {
+  @apply w-10 h-10 flex items-center justify-center rounded-md;
+  @apply border border-border text-sm font-medium;
+  @apply transition-all duration-200;
+}
+
+.pagination-page:hover:not(:disabled) {
+  @apply border-primary/50 bg-primary/5 shadow-sm;
+}
+
+.pagination-page-active {
+  @apply bg-primary text-primary-foreground border-primary;
+  @apply shadow-md shadow-primary/25;
+}
+
+/* Ellipsis indicator */
+.pagination-ellipsis {
+  @apply flex items-center justify-center w-10 h-10;
+  @apply text-muted-foreground;
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .pagination-controls {
+    @apply gap-0.5;
+  }
+  
+  .pagination-page {
+    @apply w-8 h-8 text-xs;
+  }
+  
+  .pagination-arrow {
+    @apply px-2 py-1 text-xs;
+  }
+  
+  .pagination-info {
+    @apply text-xs px-3 py-1;
+  }
+}
+
+/* Loading state */
+.pagination-loading {
+  @apply opacity-50 pointer-events-none;
+}
+
+.pagination-loading .pagination-btn {
+  @apply animate-pulse;
+}
+
+/* Smooth page transitions */
+.page-transition-enter {
+  @apply opacity-0 transform translate-y-4;
+}
+
+.page-transition-enter-active {
+  @apply opacity-100 transform translate-y-0;
+  @apply transition-all duration-300 ease-out;
+}
+
+.page-transition-exit {
+  @apply opacity-100 transform translate-y-0;
+}
+
+.page-transition-exit-active {
+  @apply opacity-0 transform -translate-y-4;
+  @apply transition-all duration-200 ease-in;
+}
+
+/* Enhanced hover effects */
+.pagination-btn::after {
+  content: '';
+  @apply absolute inset-0 rounded-md;
+  @apply bg-gradient-to-r from-transparent via-primary/5 to-transparent;
+  @apply opacity-0 transition-opacity duration-300;
+  @apply -translate-x-full;
+}
+
+.pagination-btn:hover::after {
+  @apply opacity-100 translate-x-0;
+  animation: shimmer 0.8s ease-out;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Focus states for accessibility */
+.pagination-btn:focus-visible {
+  @apply outline-none ring-2 ring-primary ring-offset-2;
+  @apply ring-offset-background;
+}
+
+/* Custom scrollbar for mobile horizontal scroll */
+.pagination-controls {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--primary)) hsl(var(--muted));
+}
+
+.pagination-controls::-webkit-scrollbar {
+  height: 4px;
+}
+
+.pagination-controls::-webkit-scrollbar-track {
+  @apply bg-muted rounded;
+}
+
+.pagination-controls::-webkit-scrollbar-thumb {
+  @apply bg-primary/50 rounded hover:bg-primary/70;
+}
+
+/* Pagination summary */
+.pagination-summary {
+  @apply text-xs text-muted-foreground;
+  @apply hidden sm:block;
+}
+
+/* Advanced animation for page changes */
+.pagination-page-change {
+  @apply transform transition-all duration-200;
+}
+
+.pagination-page-change-enter {
+  @apply scale-90 opacity-0;
+}
+
+.pagination-page-change-enter-active {
+  @apply scale-100 opacity-100;
+}
+
+.pagination-page-change-exit {
+  @apply scale-100 opacity-100;
+}
+
+.pagination-page-change-exit-active {
+  @apply scale-90 opacity-0;
+}
+
+/* Dark mode enhancements */
+@media (prefers-color-scheme: dark) {
+  .pagination-btn-current {
+    @apply shadow-primary/30;
+  }
+  
+  .pagination-arrow:hover {
+    @apply bg-primary/10;
+  }
+  
+  .pagination-page:hover:not(:disabled) {
+    @apply bg-primary/10;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .pagination-btn {
+    @apply border-2;
+  }
+  
+  .pagination-btn-current {
+    @apply border-primary;
+  }
+}

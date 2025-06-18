@@ -1,0 +1,183 @@
+/public/
+├── favicon.ico                 # Favicon của trang web
+├── manifest.json               # Web App Manifest cho PWA
+├── robots.txt                  # Hướng dẫn robots crawler
+├── icons/                      # Icons cho PWA và favicon
+│   ├── icon-192x192.png
+│   └── icon-512x512.png
+├── images/                     # Hình ảnh tĩnh
+│   ├── logo.png
+│   ├── logo-dark.png
+│   └── placeholder.png
+/src/app/
+├── layout.tsx                  # Root layout, áp dụng cho toàn bộ ứng dụng
+├── page.tsx                    # Trang chủ "/" 
+├── favicon.ico                 # Favicon cụ thể cho từng route
+├── sitemap.ts                  # Dynamic sitemap generator
+├── robots.ts                   # Dynamic robots.txt generator
+├── opengraph-image.tsx         # OG image động cho trang chủ
+├── error.tsx                   # Error boundary cho toàn bộ ứng dụng
+├── loading.tsx                 # Loading UI cho toàn bộ ứng dụng
+├── not-found.tsx               # UI cho 404 errors
+├── (auth)/                     # Group routes liên quan đến auth
+│   ├── login/
+│   │   ├── page.tsx            # Trang đăng nhập
+│   │   └── layout.tsx          # Layout riêng cho phần auth
+│   ├── register/
+│   │   └── page.tsx            # Trang đăng ký
+│   ├── forgot-password/
+│   │   └── page.tsx            # Trang quên mật khẩu
+│   └── profile/
+│       ├── page.tsx            # Trang profile user
+│       └── layout.tsx          # Layout cho profile
+├── (main)/                     # Group routes chính
+│   ├── layout.tsx              # Layout cho main group (bao gồm Header, Footer)
+│   ├── page.tsx                # Trang home (/)
+│   ├── search/
+│   │   └── page.tsx            # Trang tìm kiếm
+│   ├── latest/
+│   │   └── page.tsx            # Trang truyện mới cập nhật
+│   ├── category/
+│   │   ├── [slug]/
+│   │   │   ├── page.tsx        # Trang chi tiết thể loại
+│   │   │   └── opengraph-image.tsx  # OG image động cho thể loại
+│   │   └── page.tsx            # Trang danh sách thể loại
+│   ├── story/
+│   │   └── [slug]/
+│   │       ├── page.tsx        # Trang chi tiết truyện
+│   │       └── opengraph-image.tsx  # OG image động cho trang truyện
+│   └── read/
+│       └── [slug]/
+│           └── [chapter]/
+│               └── page.tsx    # Trang đọc truyện
+└── api/                        # API Routes
+    ├── auth/
+    │   └── [...nextauth]/
+    │       ├── route.ts        # Xử lý NextAuth.js
+    │       └── options.ts      # Cấu hình NextAuth
+    └── v1/
+        ├── home/
+        │   └── route.ts        # API cho trang chủ
+        ├── stories/
+        │   └── route.ts        # API danh sách truyện
+        ├── categories/
+        │   └── route.ts        # API danh sách thể loại
+        ├── search/
+        │   └── route.ts        # API tìm kiếm (Algolia)
+        ├── comments/
+        │   └── route.ts        # API comments (Pusher)
+        └── bookmarks/
+            └── route.ts        # API bookmark truyện
+/src/components/
+├── ui/                         # Base UI components (shadcn/ui)
+│   ├── button.tsx
+│   ├── dropdown-menu.tsx
+│   ├── input.tsx
+│   ├── select.tsx
+│   ├── tabs.tsx
+│   ├── toast.tsx
+│   ├── tooltip.tsx
+│   └── skeleton.tsx
+├── common/                     # Common UI components
+│   ├── Header.tsx              # Header của trang
+│   ├── Footer.tsx              # Footer của trang
+│   ├── SearchBar.tsx           # Thanh tìm kiếm
+│   ├── ThemeToggle.tsx         # Nút chuyển đổi light/dark mode
+│   ├── ThemeSelector.tsx       # Selector cho colors
+│   ├── ThemeSettings.tsx       # Cài đặt theme dropdown
+│   └── ThemeDemo.tsx           # Demo theme UI
+├── home/                       # Components cho trang chủ
+│   ├── HeroSection.tsx         # Hero section trang chủ
+│   ├── PopularStories.tsx      # Grid truyện phổ biến
+│   ├── CategoryList.tsx        # Danh sách thể loại
+│   └── StoryCard.tsx           # Card hiển thị truyện
+├── story/                      # Components liên quan đến truyện
+│   ├── StoryHeader.tsx         # Header trang truyện
+│   ├── StoryDetails.tsx        # Thông tin chi tiết truyện
+│   ├── ChaptersList.tsx        # Danh sách chương
+│   ├── RelatedStories.tsx      # Truyện liên quan
+│   ├── CommentSection.tsx      # Phần bình luận
+│   └── BookmarkButton.tsx      # Nút bookmark
+├── reading/                    # Components cho trang đọc truyện
+│   ├── MangaReader.tsx         # Reader component chính
+│   ├── ReadingHeader.tsx       # Header khi đọc
+│   ├── ChapterNavigation.tsx   # Thanh điều hướng chương
+│   ├── ReadingSettings.tsx     # Cài đặt trải nghiệm đọc
+│   └── Skeletons.tsx           # Loading skeletons
+├── search/                     # Components cho tìm kiếm
+│   ├── AdvancedSearch.tsx      # Form tìm kiếm nâng cao
+│   ├── SearchResults.tsx       # Kết quả tìm kiếm
+│   └── SearchFilters.tsx       # Bộ lọc tìm kiếm
+├── profile/                    # Components cho profile
+│   ├── ProfileHeader.tsx       # Header thông tin user
+│   ├── ReadingHistory.tsx      # Lịch sử đọc
+│   ├── Bookmarks.tsx           # Truyện đã lưu
+│   └── ProfileSettings.tsx     # Cài đặt tài khoản
+├── auth/                       # Components liên quan đến auth
+│   ├── LoginForm.tsx           # Form đăng nhập
+│   ├── RegisterForm.tsx        # Form đăng ký
+│   └── ResetPasswordForm.tsx   # Form reset password
+├── analytics/                  # Tracking components
+│   └── GoogleAnalytics.tsx     # Google Analytics integration
+├── comments/                   # Components cho bình luận
+│   ├── CommentCard.tsx         # Card hiển thị comment
+│   ├── CommentForm.tsx         # Form viết comment
+│   └── CommentsSection.tsx     # Section comments (real-time)
+├── i18n/                       # Internationalization
+│   └── LanguageSelector.tsx    # Công cụ chọn ngôn ngữ
+├── seo/                        # SEO components
+│   ├── ArticleJsonLd.tsx       # JSON-LD cho bài viết
+│   └── MangaJsonLd.tsx         # JSON-LD cho truyện
+└── theme-provider.tsx          # Provider cho theme system
+/src/lib/
+├── api/                        # API utilities
+│   ├── client.ts               # Axios client setup
+│   ├── endpoints.ts            # API endpoints constants
+│   ├── home.ts                 # Home API functions
+│   ├── stories.ts              # Stories API functions
+│   └── categories.ts           # Categories API functions
+├── hooks/                      # Custom React hooks
+│   ├── useDebounce.ts          # Debounce hook
+│   ├── useLocalStorage.ts      # LocalStorage hook
+│   ├── useMediaQuery.ts        # Media query hook
+│   ├── useReadingSettings.ts   # Reading settings hook
+│   └── useOnClickOutside.ts    # Click outside handler
+├── utils/                      # Utility functions
+│   ├── format.ts               # Formatting utilities
+│   ├── client-utils.ts         # Client-side utilities
+│   ├── server-utils.ts         # Server-side utilities
+│   └── validation.ts           # Validation functions
+└── constants/                  # Constants
+    ├── routes.ts               # Route constants
+    ├── auth.ts                 # Authentication constants
+    └── common.ts               # Common constants
+/src/store/
+├── index.ts                    # Export root store
+├── store.ts                    # Redux store configuration
+├── provider.tsx                # Redux Provider wrapper
+├── hooks.ts                    # Redux hooks (useAppDispatch, useAppSelector)
+└── slices/                     # Redux slices
+    ├── homeSlice.ts            # Home page state
+    ├── storySlice.ts           # Story page state
+    ├── readingSlice.ts         # Reading state
+    ├── userSlice.ts            # User state
+    └── uiSlice.ts              # UI state
+/src/styles/
+├── globals.css                 # CSS globals và Tailwind directives
+└── nprogress.css               # Styles cho loading bar
+/src/_actions/
+├── user-actions.ts             # User-related server actions
+├── story-actions.ts            # Story-related server actions
+├── comment-actions.ts          # Comment-related server actions
+└── reading-actions.ts          # Reading-related server actions
+/
+├── .env.local                  # Biến môi trường local, chứa API keys và URLs
+├── .env.production             # Biến môi trường production
+├── .eslintrc.json              # Cấu hình ESLint
+├── .gitignore                  # Các file/thư mục bị ignore trong git
+├── next.config.js              # Cấu hình Next.js, bao gồm rewrites, redirects, image domains
+├── package.json                # Dependencies và scripts
+├── postcss.config.js           # Cấu hình PostCSS cho Tailwind
+├── tailwind.config.js          # Cấu hình Tailwind và theme
+├── tsconfig.json               # Cấu hình TypeScript
+└── middleware.ts               # Next.js middleware
