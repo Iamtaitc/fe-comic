@@ -1,19 +1,26 @@
 // next.config.js
-declare var process: any;
-declare var module: any;
-/** @type {import('next').NextConfig} */
+import type { NextConfig } from 'next';
+
+declare const process: {
+  env: {
+    NODE_ENV: string;
+    API_BASE_URL?: string;
+    NEXT_PUBLIC_API_URL?: string;
+  };
+};
+
 // const withPWA = require('next-pwa')({
-//   dest: 'public',
 //   disable: process.env.NODE_ENV === 'development',
 //   register: true,
 //   skipWaiting: true,
 // });
-const nextConfig = {
+
+const nextConfig: NextConfig = {
   images: {
     domains: [
       'localhost', // Cho môi trường development
       'img.otruyenapi.com',
-      // Thêm các domain khác chứa hình ảnh truyện tranh
+      'sv1.otruyencdn.com'
     ],
     formats: ['image/avif', 'image/webp'],
   },
@@ -33,7 +40,7 @@ const nextConfig = {
       fallback: [
         {
           source: '/api/v1/:path*',
-          destination: `${process.env.API_BASE_URL}/api/v1/:path*`,
+          destination: `${process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/v1/:path*`,
         },
       ],
     };

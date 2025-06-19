@@ -31,7 +31,7 @@ apiClient.interceptors.response.use(
     // Xử lý lỗi
     if (error.response) {
       // Lỗi từ server
-      console.error('API Error:', error.response.data);
+      console.error('API Error:', error.response.data.data);
     } else if (error.request) {
       // Không nhận được response
       console.error('No response received:', error.request);
