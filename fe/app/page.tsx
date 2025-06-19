@@ -10,10 +10,12 @@ import TopWeeklyStoriesResponsive from "../src/components/TopWeeklyStories/TopWe
 import { Flame, Clock, CheckCircle, Calendar } from "lucide-react";
 import {
   getPopularStories,
-  getOngoingStories,
-  getCompletedStories,
-  getUpcomingStories,
-} from "@/lib/api/comic";
+} from "@/lib/api/comic/popular";
+import {
+    getOngoingStories,
+    getCompletedStories,
+    getUpcomingStories,
+} from "@/lib/api/comic/status";
 import { Skeleton } from "../src/components/ui/skeleton";
 import {
   Alert,

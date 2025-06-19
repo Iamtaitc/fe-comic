@@ -1,7 +1,7 @@
 // src/lib/api/client.ts
 import axios from 'axios';
 
-const baseURL =  'https://d050-2402-800-620e-5501-3887-23ea-2857-27e.ngrok-free.app/api/v1';
+const baseURL =  'https://3e45-2402-800-620e-5501-3887-23ea-2857-27e.ngrok-free.app/api/v1';
 
 export const apiClient = axios.create({
   baseURL,
@@ -31,7 +31,7 @@ apiClient.interceptors.response.use(
     // Xử lý lỗi
     if (error.response) {
       // Lỗi từ server
-      console.error('API Error:', error.response.data);
+      console.error('API Error:', error.response.data.data);
     } else if (error.request) {
       // Không nhận được response
       console.error('No response received:', error.request);

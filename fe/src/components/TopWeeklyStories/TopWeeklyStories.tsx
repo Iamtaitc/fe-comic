@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { RootState } from "@/store/store";
-import { StoryObject } from "@/lib/api/comic";
+import { StoryObject } from "@/lib/api/comic/types";
 import Image from "next/image";
 import Link from "next/link";
 

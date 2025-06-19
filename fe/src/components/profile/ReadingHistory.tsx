@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Clock, LayoutGrid, List, Trash2 } from "lucide-react";
-import { StoryObject } from "@/lib/api/comic";
+import { StoryObject } from "@/lib/api/comic/types";
 import { toast } from "sonner";
 
 interface ReadingHistoryItem {

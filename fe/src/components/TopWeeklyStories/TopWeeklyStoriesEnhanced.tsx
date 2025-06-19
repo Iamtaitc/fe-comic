@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { StoryObject } from "@/lib/api/comic";
+import { StoryObject } from "@/lib/api/comic/types";
 import Image from "next/image";
 import Link from "next/link";
 

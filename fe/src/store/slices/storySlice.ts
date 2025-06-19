@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { getStoryDetail, getChapterDetail } from "@/lib/api/comic";
+import { getStoryDetail } from "@/lib/api/comic/detail";
+import { getChapterDetail } from "@/lib/api/comic/chapter";
 
 interface Chapter {
   _id: string;

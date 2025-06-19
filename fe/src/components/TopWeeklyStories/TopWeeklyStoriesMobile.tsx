@@ -6,7 +6,7 @@ import { RootState } from "@/store/store";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback } from "react";
-import { StoryObject } from "@/lib/api/comic";
+import { StoryObject } from "@/lib/api/comic/types";
 
 const TopWeeklyStoriesMobile: React.FC = () => {
   const { topWeeklyStories = [], loading, error } = useSelector(

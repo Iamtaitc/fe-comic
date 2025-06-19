@@ -1,6 +1,8 @@
 // src/store/slices/homeSlice.ts
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getHomeData, HomeDataResponse, StoryObject, CategoryObject } from "@/lib/api/comic";
+import { StoryObject, CategoryObject } from "@/lib/api/comic/types";
+import { getHomeData, HomeDataResponse } from '@/lib/api/comic/home';
+
 
 interface HomeState {
   popularStories: StoryObject[];

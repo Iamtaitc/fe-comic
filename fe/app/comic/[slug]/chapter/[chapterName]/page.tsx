@@ -1,5 +1,5 @@
 // app/comic/[slug]/chapter/[chapterName]/page.tsx
-import { getChapterDetail } from "@/lib/api/comic";
+import { getChapterDetail } from "@/lib/api/comic/chapter";
 import ChapterReaderClient from "./ChapterReaderClient";
 import { notFound } from "next/navigation";
 

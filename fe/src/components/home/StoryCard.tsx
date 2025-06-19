@@ -6,7 +6,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { BookOpen, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { StoryObject } from "@/lib/api/comic";
+import { StoryObject } from "@/lib/api/comic/types";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 interface StoryCardProps {

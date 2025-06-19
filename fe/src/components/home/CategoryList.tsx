@@ -3,7 +3,7 @@
 
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { CategoryObject } from "@/lib/api/comic"
+import { CategoryObject } from "@/lib/api/comic/types"
 import { Layers } from "lucide-react"
 
 interface CategoryListProps {

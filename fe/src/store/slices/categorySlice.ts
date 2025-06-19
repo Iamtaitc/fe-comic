@@ -1,14 +1,12 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { StoryObject, CategoryObject } from "@/lib/api/comic";
-import {
-  getLatestStories,
-  getPopularStories,
-  getCompletedStories,
-  getUpcomingStories,
-  getStoriesByCategory,
-  getCategory,
-  getTopWeeklyStories,
-} from "@/lib/api/comic";
+import { StoryObject, CategoryObject } from "@/lib/api/comic/types";
+import { getTopWeeklyStories} from "@/lib/api/comic/top-weekly";
+import { getLatestStories } from '@/lib/api/comic/latest';
+import { getPopularStories } from '@/lib/api/comic/popular';
+import { getCompletedStories, getUpcomingStories } from '@/lib/api/comic/status';
+import { getStoriesByCategory, getCategory } from '@/lib/api/comic/category';
+
+
 
 interface CategoryState {
   stories: StoryObject[];

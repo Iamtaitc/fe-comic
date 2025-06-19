@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, memo } from "react";
-import { StoryObject } from "@/lib/api/comic";
+import { StoryObject } from "@/lib/api/comic/types";
 import { StoryCard } from "./StoryCard";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";

@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import { BookOpen, Clock, Heart, Share2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { StoryObject } from "@/lib/api/comic";
+import { StoryObject } from "@/lib/api/comic/types";
 
 interface StoryHeaderProps {
   story: StoryObject;

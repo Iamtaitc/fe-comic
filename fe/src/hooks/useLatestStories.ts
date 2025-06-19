@@ -2,7 +2,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { StoryObject, StoryList, getLatestStories } from "@/lib/api/comic";
+import { getLatestStories } from "@/lib/api/comic/latest";
+import { StoryObject, StoryList } from "@/lib/api/comic/types";
 import { FilterOptions } from "@/components/latest/LatestStoriesContainer";
 
 interface PaginationInfo {

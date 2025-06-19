@@ -6,7 +6,7 @@ import { useInView } from "framer-motion";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StoryCard } from "@/components/home/StoryCard";
-import { StoryObject } from "@/lib/api/comic";
+import { StoryObject } from "@/lib/api/comic/types";
 
 interface RelatedStoriesProps {
   stories: StoryObject[];

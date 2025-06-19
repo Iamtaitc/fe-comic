@@ -7,7 +7,7 @@ import { StoryCard } from "@/components/home/StoryCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Loader2, ArrowUp } from "lucide-react";
-import { StoryObject } from "@/lib/api/comic";
+import { StoryObject } from "@/lib/api/comic/types";
 import { FilterOptions } from "./LatestStoriesContainer";
 
 interface LatestStoriesGridProps {

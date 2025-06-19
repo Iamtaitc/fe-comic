@@ -1,7 +1,8 @@
 // src/lib/hooks/use-search.ts
 import { useState, useEffect } from "react";
 import { useDebounce } from "./useDebounce";
-import { searchStories, StoryObject } from "@/lib/api/comic";
+import { searchStories } from "@/lib/api/comic/search";
+import { StoryObject } from "@/lib/api/comic/types";
 
 export function useSearch() {
   const [query, setQuery] = useState("");

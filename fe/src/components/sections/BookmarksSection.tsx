@@ -9,8 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { getUserBookmarks, removeBookmark } from '@/lib/api/comic';
-import { StoryObject } from '@/lib/api/comic';
+import { getUserBookmarks, removeBookmark } from '@/lib/api/comic/user';
+import { StoryObject } from '@/lib/api/comic/types';
 import { StoryGrid } from '../home/StoryCard';
 import Link from 'next/link';
 

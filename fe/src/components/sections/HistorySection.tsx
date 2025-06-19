@@ -27,8 +27,8 @@ import {
 import { useToast } from '@/components/ui/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { getUserHistory, clearAllHistory, clearHistoryById } from '@/lib/api/comic';
-import { StoryObject } from '@/lib/api/comic';
+import { getUserHistory, clearAllHistory, clearHistoryById } from '@/lib/api/comic/user';
+import { StoryObject } from '@/lib/api/comic/types';
 import Link from 'next/link';
 
 interface HistoryItem extends StoryObject {

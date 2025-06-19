@@ -181,7 +181,7 @@ export function usePagination({
 ("use client");
 
 import { useState, useEffect, useCallback } from "react";
-import { StoryObject, StoryList } from "@/lib/api/comic";
+import { StoryObject, StoryList } from "@/lib/api/comic/types";
 
 interface UseStoriesWithPaginationOptions {
   fetcher: (page: number, limit: number) => Promise<StoryList>;

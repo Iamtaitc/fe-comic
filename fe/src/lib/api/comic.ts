@@ -1,6 +1,6 @@
 // src/lib/api/comic.ts
 import { apiClient } from "./client";
-
+//done
 export interface CategoryObject {
   _id: string;
   name: string;
@@ -13,7 +13,7 @@ export interface CategoryObject {
   storyCount?: number;
   description?: string;
 }
-
+//done
 export interface StoryObject {
   _id: string;
   name: string;
@@ -28,7 +28,7 @@ export interface StoryObject {
   updatedAt?: string;
   weeklyViewCount?: number;
 }
-
+//done
 export interface HomeDataResponse {
   success: boolean;
   message: string;
@@ -44,7 +44,7 @@ export interface HomeDataResponse {
     categories: CategoryObject[];
   };
 }
-
+//done
 // Updated interface cho category stories response
 export interface CategoryStoriesResponse {
   success: boolean;
@@ -76,7 +76,7 @@ export interface CategoryStoriesResponse {
   };
   timestamp: string;
 }
-
+//done
 export interface StoryList {
   success: boolean;
   message: string;
@@ -89,7 +89,7 @@ export interface StoryList {
     };
   };
 }
-
+//done
 export interface StoryDetail {
   success: boolean;
   message: string;
@@ -106,7 +106,7 @@ export interface StoryDetail {
     }[];
   };
 }
-
+//done
 export interface ChapterDetail {
   success: boolean;
   message: string;
@@ -127,7 +127,7 @@ export interface ChapterDetail {
     }[];
   };
 }
-
+//done
 export interface UserHistoryResponse {
   success: boolean;
   data: {
@@ -137,7 +137,7 @@ export interface UserHistoryResponse {
     };
   };
 }
-
+//done
 export interface SavedStoriesResponse {
   success: boolean;
   data: {
@@ -158,12 +158,12 @@ export interface GenreStoriesResponse {
     };
   };
 }
-
+//done
 // Lấy dữ liệu trang chủ
 export async function getHomeData(): Promise<HomeDataResponse> {
   return apiClient.get("/home");
 }
-
+//done
 // Lấy danh sách truyện mới nhất
 export async function getLatestStories(params: {
   page?: number;
@@ -175,12 +175,12 @@ export async function getLatestStories(params: {
 }): Promise<StoryList> {
   return apiClient.get("/comics/latest", { params });
 }
-
+//done
 // lấy danh sách thể loại truyện
 export async function getCategory(): Promise<CategoryObject[]> {
   return apiClient.get("/comics/categorise");
 }
-
+//done
 // lấy danh sách truyện top tuần
 export async function getTopWeeklyStories(): Promise<StoryList> {
   return apiClient.get("/comics/top-weekly");
@@ -193,7 +193,7 @@ export async function getPopularStories(params: {
 }): Promise<StoryList> {
   return apiClient.get("/comics/popular", { params });
 }
-
+//done
 // Updated function - Lấy danh sách truyện theo danh mục
 export async function getStoriesByCategory(
   slug: string,
@@ -207,19 +207,19 @@ export async function getStoriesByCategory(
 ): Promise<CategoryStoriesResponse> {
   return apiClient.get(`/comics/category/${slug}`, { params });
 }
-
+//done
 // Tìm kiếm truyện
 export async function searchStories(query: string): Promise<StoryList> {
   return apiClient.get("/comics/search", {
     params: { keyword: query },
   });
 }
-
+//done
 // Lấy chi tiết truyện
 export async function getStoryDetail(slug: string): Promise<StoryDetail> {
   return apiClient.get(`/comics/${slug}`);
 }
-
+//done
 // Lấy chi tiết chapter
 export async function getChapterDetail(
   slug: string,
@@ -227,7 +227,7 @@ export async function getChapterDetail(
 ): Promise<ChapterDetail> {
   return apiClient.get(`/comics/${slug}/chapter/${chapterName}`);
 }
-
+//done
 // Lấy danh sách truyện đang phát hành
 export async function getOngoingStories(params: {
   page?: number;
@@ -235,7 +235,7 @@ export async function getOngoingStories(params: {
 }): Promise<StoryList> {
   return apiClient.get("/comics/danh-sach/dang-phat-hanh", { params });
 }
-
+//done
 // Lấy danh sách truyện đã hoàn thành
 export async function getCompletedStories(params: {
   page?: number;
@@ -243,7 +243,7 @@ export async function getCompletedStories(params: {
 }): Promise<StoryList> {
   return apiClient.get("/comics/danh-sach/da-hoan-thanh", { params });
 }
-
+//done
 // Lấy danh sách truyện sắp ra mắt
 export async function getUpcomingStories(params: {
   page?: number;
@@ -251,7 +251,7 @@ export async function getUpcomingStories(params: {
 }): Promise<StoryList> {
   return apiClient.get("/comics/danh-sach/sap-ra-mat", { params });
 }
-
+//done
 // Lấy lịch sử đọc của người dùng
 export async function getUserHistory(
   params: {
@@ -261,7 +261,7 @@ export async function getUserHistory(
 ): Promise<UserHistoryResponse> {
   return apiClient.get("/user/history", { params });
 }
-
+//done
 // Lấy danh sách truyện đã bookmark
 export async function getUserBookmarks(
   params: {
@@ -281,7 +281,7 @@ export async function getStoriesByGenre(
     params,
   });
 }
-
+//done
 // Bookmark truyện
 export async function bookmarkStory(
   comicId: string
@@ -292,7 +292,7 @@ export async function bookmarkStory(
     message: response.data.message || "Đã thêm vào danh sách yêu thích",
   };
 }
-
+//done
 // Bỏ bookmark truyện
 export async function removeBookmark(
   comicId: string
@@ -303,7 +303,7 @@ export async function removeBookmark(
     message: response.data.message || "Đã bỏ khỏi danh sách yêu thích",
   };
 }
-
+//done
 // Xóa toàn bộ lịch sử
 export async function clearAllHistory(): Promise<{
   success: boolean;
@@ -315,7 +315,7 @@ export async function clearAllHistory(): Promise<{
     message: response.data.message || "Đã xóa toàn bộ lịch sử",
   };
 }
-
+//done
 // Xóa một mục lịch sử cụ thể
 export async function clearHistoryById(
   historyId: string
