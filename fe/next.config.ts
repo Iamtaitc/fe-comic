@@ -33,7 +33,7 @@ const nextConfig = {
       fallback: [
         {
           source: '/api/v1/:path*',
-          destination: `${process.env.API_BASE_URL}/api/v1/:path*`,
+          destination: `https://d050-2402-800-620e-5501-3887-23ea-2857-27e.ngrok-free.app/api/v1/:path*`,
         },
       ],
     };

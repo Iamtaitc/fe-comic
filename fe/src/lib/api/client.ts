@@ -1,7 +1,7 @@
 // src/lib/api/client.ts
 import axios from 'axios';
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
+const baseURL =  'https://d050-2402-800-620e-5501-3887-23ea-2857-27e.ngrok-free.app/api/v1';
 
 export const apiClient = axios.create({
   baseURL,
