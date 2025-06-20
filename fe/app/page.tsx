@@ -23,7 +23,7 @@ import {
   AlertDescription,
 } from "../src/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-
+ 
 export default function Home() {
   const dispatch = useAppDispatch();
   const { popularStories, categories, loading, error } = useAppSelector(

@@ -17,13 +17,13 @@ const initialState: HomeState = {
   loading: false,
   error: null,
 };
-
+  
 export const fetchHomeData = createAsyncThunk(
   "home/fetchHomeData",
   async (_, { rejectWithValue }) => {
     try {
       const response = await getHomeData();
-      console.log("HomeData Response:", response);
+      console.log("HomeData Response:", response.data);
       if (response.success && response.data) {
         return {
           popularStories: response.data.popularStorys.data.stories || [],
