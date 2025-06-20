@@ -89,11 +89,11 @@ export const fetchStoryDetail = createAsyncThunk(
   async (slug: string, { rejectWithValue }) => {
     try {
       const response = await getStoryDetail(slug);
+      console.log("Fetch Story Detail Response:", response);
       if (!response.success || !response.data?.Story) {
         return rejectWithValue(response.message || "Không thể lấy chi tiết truyện");
       }
       
-      // Kết hợp Story với chapters từ API response
       const storyWithChapters: StoryWithChapters = {
         ...response.data.Story,
         chapters: response.data.chapters || []

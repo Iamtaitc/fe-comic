@@ -50,5 +50,12 @@ export async function getChapterDetail(
   slug: string,
   chapterName: string
 ): Promise<ChapterDetail> {
-  return apiClient.get(`/comics/${slug}/chapter/${chapterName}`);
+  try {
+    const response = await apiClient.get(`/comics/${slug}/chapter/${chapterName}`);
+    console.log("Chapter Response:", response.data); // Log dữ liệu thực tế
+    return response.data; // Trả về response.data để khớp với ChapterDetail
+  } catch (error) {
+    console.error("API Error:", error);
+    throw error;
+  }
 }
