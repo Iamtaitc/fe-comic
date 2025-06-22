@@ -1,8 +1,6 @@
-// hooks/useChapterReader.ts
-import { useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { fetchChapterDetail, resetStoryState, setChapterDetail } from "@/store/slices/storySlice";
+import { fetchChapterDetail, setChapterDetail, resetStoryState } from "@/store/slices/storySlice";
 
 interface UseChapterReaderProps {
   slug: string;
@@ -11,17 +9,27 @@ interface UseChapterReaderProps {
   initialError?: string;
 }
 
-export const useChapterReader = ({ 
-  slug, 
-  chapterName, 
-  initialChapter, 
-  initialError 
-}: UseChapterReaderProps) => {
-  const router = useRouter();
+export function useChapterReader({
+  slug,
+  chapterName,
+  initialChapter,
+  initialError,
+}: UseChapterReaderProps) {
   const dispatch = useAppDispatch();
   const { chapterDetail, loading, error } = useAppSelector((state) => state.story);
 
-  // Initialize data
+  const goToNextChapter = useCallback(() => {
+    if (chapterDetail?.navigation?.next?.chapter_name) {
+      dispatch(fetchChapterDetail({ slug, chapterName: chapterDetail.navigation.next.chapter_name }));
+    }
+  }, [dispatch, slug, chapterDetail?.navigation]);
+
+  const goToPrevChapter = useCallback(() => {
+    if (chapterDetail?.navigation?.prev?.chapter_name) {
+      dispatch(fetchChapterDetail({ slug, chapterName: chapterDetail.navigation.prev.chapter_name }));
+    }
+  }, [dispatch, slug, chapterDetail?.navigation]);
+
   useEffect(() => {
     if (initialChapter) {
       dispatch(setChapterDetail(initialChapter));
@@ -34,26 +42,13 @@ export const useChapterReader = ({
     return () => {
       dispatch(resetStoryState());
     };
-  }, [slug, chapterName, dispatch, initialChapter, initialError]);
-
-  const chapter = chapterDetail || initialChapter;
-
-  // Navigation handlers
-  const goToNextChapter = useCallback(() => {
-    if (!slug || !chapter?.navigation?.next) return;
-    router.push(`/comic/${slug}/chapter/${chapter.navigation.next.chapter_name}`);
-  }, [slug, chapter?.navigation?.next, router]);
-
-  const goToPrevChapter = useCallback(() => {
-    if (!slug || !chapter?.navigation?.prev) return;
-    router.push(`/comic/${slug}/chapter/${chapter.navigation.prev.chapter_name}`);
-  }, [slug, chapter?.navigation?.prev, router]);
+  }, [dispatch, slug, chapterName, initialChapter, initialError]);
 
   return {
-    chapter,
+    chapter: chapterDetail,
     loading,
-    error: error || initialError,
+    error,
     goToNextChapter,
-    goToPrevChapter
+    goToPrevChapter,
   };
-};
+}

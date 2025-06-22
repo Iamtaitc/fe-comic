@@ -46,5 +46,18 @@ export async function getStoriesByCategory(
 }
 
 export async function getCategory(): Promise<CategoryObject[]> {
-  return apiClient.get('/comics/categorise');
+  const response = await apiClient.get('/comics/categorise');
+  // Kiểm tra nếu response.data là object chứa mảng data
+  if (response.data && response.data.data && Array.isArray(response.data.data)) {
+    return response.data.data;
+  }
+  // Nếu response.data là mảng trực tiếp
+  if (Array.isArray(response.data)) {
+    return response.data;
+  }
+  // Nếu response là mảng trực tiếp (trường hợp log Array(54))
+  if (Array.isArray(response)) {
+    return response;
+  }
+  throw new Error("Dữ liệu API không hợp lệ");
 }

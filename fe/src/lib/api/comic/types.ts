@@ -1,4 +1,5 @@
 export interface CategoryObject {
+  id: string;
   _id: string;
   name: string;
   slug: string;

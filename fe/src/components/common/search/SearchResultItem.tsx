@@ -1,4 +1,4 @@
-// src/components/common/SearchResultItem.tsx
+// src/components/common/search/SearchResultItem.tsx
 import Image from "next/image";
 import Link from "next/link";
 import { StoryObject } from "@/lib/api/comic/types";

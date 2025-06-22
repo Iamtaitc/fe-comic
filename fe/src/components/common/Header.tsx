@@ -4,7 +4,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { LogIn } from "lucide-react";
-import { ThemeToggle } from "./ThemeToggle";
 import { Logo } from "./Logo";
 import { MainNav } from "./MainNav";
 import { MobileNav } from "./MobileNav";
@@ -40,7 +39,6 @@ export function Header() {
         <div className="flex items-center gap-4">
           <SearchInput className="hidden md:flex" />
           <SearchInput mobile className="md:hidden" />
-          <ThemeToggle />
           <Button variant="default" size="sm" className="gap-2 rounded-full">
             <LogIn className="h-4 w-4" />
             <span className="hidden sm:inline-block">Đăng nhập</span>

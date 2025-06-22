@@ -21,7 +21,6 @@ export default function StoryPage({ params }: StoryPageProps) {
 
   useEffect(() => {
     if (slug) {
-      // Reset state trước khi fetch để tránh hiển thị data cũ
       dispatch(resetStoryState());
       dispatch(fetchStoryDetail(slug));
     }
@@ -31,7 +30,6 @@ export default function StoryPage({ params }: StoryPageProps) {
     };
   }, [slug, dispatch]);
 
-  // Hiển thị loading khi đang tải và chưa có data
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-accent/10">
@@ -51,8 +49,7 @@ export default function StoryPage({ params }: StoryPageProps) {
     );
   }
 
-  // Hiển thị error nếu có lỗi
-  if (error) {
+  if (error && error !== "null") {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="container max-w-md">
@@ -82,7 +79,6 @@ export default function StoryPage({ params }: StoryPageProps) {
     );
   }
 
-  // Hiển thị thông báo không tìm thấy nếu không có data và không đang loading
   if (!storyDetail && !loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -104,6 +100,5 @@ export default function StoryPage({ params }: StoryPageProps) {
     );
   }
 
-  // Hiển thị component chính khi có data
   return <StoryDetailView slug={slug} storyDetail={storyDetail} />;
 }

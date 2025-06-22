@@ -1,4 +1,3 @@
-// fe/app/comic/[slug]/StoryDetailView.tsx
 "use client";
 
 import Link from "next/link";
@@ -12,7 +11,22 @@ import { useMemo } from "react";
 
 interface StoryDetailViewProps {
   slug: string;
-  storyDetail: any;
+  storyDetail: {
+    story: {
+      name: string;
+      origin_name: string[];
+      content: string;
+      status: string;
+      thumb_url: string;
+      category: { _id: string; name: string; slug: string }[];
+      views: number;
+      likeCount: number;
+      ratingValue: number;
+      ratingCount: number;
+      chapters: any[];
+    };
+    chapters: any[];
+  };
 }
 
 interface StoryInfo {
@@ -22,48 +36,50 @@ interface StoryInfo {
 }
 
 export default function StoryDetailView({ slug, storyDetail }: StoryDetailViewProps) {
+  const { story, chapters } = storyDetail;
+
   const storyInfo: StoryInfo[] = useMemo(() => [
     {
       label: "Lượt xem",
-      value: storyDetail.views?.toLocaleString() || "0",
+      value: story.views?.toLocaleString() || "0",
       icon: <Eye className="w-4 h-4" />
     },
     {
-      label: "Lượt thích", 
-      value: storyDetail.likeCount?.toLocaleString() || "0",
+      label: "Lượt thích",
+      value: story.likeCount?.toLocaleString() || "0",
       icon: <Heart className="w-4 h-4" />
     },
     {
       label: "Đánh giá",
-      value: storyDetail.ratingValue > 0 
-        ? `${storyDetail.ratingValue}/5 (${storyDetail.ratingCount})` 
+      value: story.ratingValue > 0 
+        ? `${story.ratingValue}/5 (${story.ratingCount})` 
         : "Chưa có",
       icon: <Star className="w-4 h-4" />
     },
     {
       label: "Chương",
-      value: storyDetail.chapters?.length?.toString() || "0",
+      value: chapters.length?.toString() || "0",
       icon: <BookOpen className="w-4 h-4" />
     }
-  ], [storyDetail]);
+  ], [story, chapters]);
 
   const statusText = useMemo(() => {
-    switch (storyDetail.status) {
+    switch (story.status) {
       case "ongoing": return "Đang cập nhật";
       case "completed": return "Hoàn thành";
       case "paused": return "Tạm dừng";
-      default: return storyDetail.status || "Không xác định";
+      default: return story.status || "Không xác định";
     }
-  }, [storyDetail.status]);
+  }, [story.status]);
 
   const statusVariant = useMemo(() => {
-    switch (storyDetail.status) {
+    switch (story.status) {
       case "ongoing": return "default";
       case "completed": return "secondary";
       case "paused": return "destructive";
       default: return "outline";
     }
-  }, [storyDetail.status]);
+  }, [story.status]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-accent/10">
@@ -71,11 +87,11 @@ export default function StoryDetailView({ slug, storyDetail }: StoryDetailViewPr
         {/* Header */}
         <div className="text-center space-y-2">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            {storyDetail.name}
+            {story.name}
           </h1>
-          {storyDetail.origin_name?.length > 0 && (
+          {story.origin_name?.length > 0 && (
             <p className="text-lg text-muted-foreground">
-              {storyDetail.origin_name.join(", ")}
+              {story.origin_name.join(", ")}
             </p>
           )}
         </div>
@@ -86,8 +102,8 @@ export default function StoryDetailView({ slug, storyDetail }: StoryDetailViewPr
           <div className="lg:col-span-1">
             <Card className="overflow-hidden">
               <LazyImage
-                src={storyDetail.thumb_url}
-                alt={storyDetail.name}
+                src={story.thumb_url}
+                alt={story.name}
                 className="w-full h-[400px] lg:h-[500px]"
                 isEager={true}
                 aspectRatio="3/4"
@@ -102,7 +118,7 @@ export default function StoryDetailView({ slug, storyDetail }: StoryDetailViewPr
               <Badge variant={statusVariant}>
                 {statusText}
               </Badge>
-              {storyDetail.category?.map((cat: any) => (
+              {story.category?.map((cat) => (
                 <Badge key={cat._id} variant="outline">
                   {cat.name}
                 </Badge>
@@ -129,7 +145,7 @@ export default function StoryDetailView({ slug, storyDetail }: StoryDetailViewPr
             </div>
 
             {/* Description */}
-            {storyDetail.content && (
+            {story.content && (
               <Card>
                 <CardContent className="p-6">
                   <h3 className="font-semibold mb-3 flex items-center gap-2">
@@ -138,7 +154,7 @@ export default function StoryDetailView({ slug, storyDetail }: StoryDetailViewPr
                   </h3>
                   <div 
                     className="text-muted-foreground leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: storyDetail.content }}
+                    dangerouslySetInnerHTML={{ __html: story.content }}
                   />
                 </CardContent>
               </Card>
@@ -150,17 +166,17 @@ export default function StoryDetailView({ slug, storyDetail }: StoryDetailViewPr
                 asChild 
                 size="lg" 
                 className="flex-1"
-                disabled={!storyDetail.chapters?.length}
+                disabled={!chapters.length}
               >
                 <Link
-                  href={`/comic/${slug}/chapter/${storyDetail.chapters?.[0]?.chapter_name}`}
+                  href={`/comic/${slug}/chapter/${chapters?.[0]?.chapter_name}`}
                 >
                   <BookOpen className="w-4 h-4 mr-2" />
                   Đọc từ đầu
                 </Link>
               </Button>
               
-              {storyDetail.chapters?.length > 1 && (
+              {chapters.length > 1 && (
                 <Button 
                   asChild 
                   variant="outline" 
@@ -168,7 +184,7 @@ export default function StoryDetailView({ slug, storyDetail }: StoryDetailViewPr
                   className="flex-1"
                 >
                   <Link
-                    href={`/comic/${slug}/chapter/${storyDetail.chapters[storyDetail.chapters.length - 1]?.chapter_name}`}
+                    href={`/comic/${slug}/chapter/${chapters[chapters.length - 1]?.chapter_name}`}
                   >
                     <Calendar className="w-4 h-4 mr-2" />
                     Đọc mới nhất
@@ -180,9 +196,8 @@ export default function StoryDetailView({ slug, storyDetail }: StoryDetailViewPr
         </div>
 
         {/* Chapter List */}
-        <ChapterList slug={slug} chapters={storyDetail.chapters} />
+        <ChapterList slug={slug} chapters={chapters} />
       </div>
     </div>
   );
 }
-

@@ -1,3 +1,5 @@
+//fe\src\components\category\CategoryHeader.tsx
+
 "use client";
 import { useEffect, useRef } from 'react';
 import { motion } from "framer-motion";

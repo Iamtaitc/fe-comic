@@ -1,4 +1,3 @@
-// Main ChapterReaderClient.tsx
 "use client";
 
 import { useEffect } from "react";
@@ -39,23 +38,19 @@ export default function ChapterReaderClient({
     chapter?.chapter?.content?.length || 0
   );
 
-  // Reset to top when chapter changes
   useEffect(() => {
     window.scrollTo(0, 0);
     setCurrentImageIndex(0);
   }, [slug, chapterName, setCurrentImageIndex]);
 
-  // Loading state
   if ((loading && !chapter) || (!initialChapter && !error && !initialError)) {
     return <LoadingState />;
   }
 
-  // Error state
   if (error) {
     return <ErrorState error={error} slug={slug} />;
   }
 
-  // No chapter data
   if (!chapter?.chapter) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">

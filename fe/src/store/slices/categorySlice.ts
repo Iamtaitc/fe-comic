@@ -1,16 +1,18 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { StoryObject, CategoryObject } from "@/lib/api/comic/types";
-import { getTopWeeklyStories} from "@/lib/api/comic/top-weekly";
-import { getLatestStories } from '@/lib/api/comic/latest';
-import { getPopularStories } from '@/lib/api/comic/popular';
-import { getCompletedStories, getUpcomingStories } from '@/lib/api/comic/status';
-import { getStoriesByCategory, getCategory } from '@/lib/api/comic/category';
+import { getTopWeeklyStories } from "@/lib/api/comic/top-weekly";
+import { getLatestStories } from "@/lib/api/comic/latest";
+import { getPopularStories } from "@/lib/api/comic/popular";
+import { getCompletedStories, getUpcomingStories } from "@/lib/api/comic/status";
+import { getStoriesByCategory, getCategory } from "@/lib/api/comic/category";
 
-
+type Status = "all" | "ongoing" | "completed" | "paused";
+type SortBy = "latest" | "popular" | "rating" | "views" | "name";
+type SortOrder = "asc" | "desc";
 
 interface CategoryState {
   stories: StoryObject[];
-  topWeeklyStories: StoryObject[]; // Add this property
+  topWeeklyStories: StoryObject[];
   categories: CategoryObject[];
   currentCategory: string | null;
   loading: boolean;
@@ -23,16 +25,17 @@ interface CategoryState {
     limit: number;
   };
   filters: {
-    status: string;
-    sortBy: string;
-    sortOrder: "asc" | "desc";
+    status: Status;
+    sortBy: SortBy;
+    sortOrder: SortOrder;
     category?: string;
+    searchQuery?: string;
   };
 }
 
 const initialState: CategoryState = {
   stories: [],
-  topWeeklyStories: [], // Initialize as empty array
+  topWeeklyStories: [],
   categories: [],
   currentCategory: null,
   loading: false,
@@ -45,14 +48,14 @@ const initialState: CategoryState = {
     limit: 18,
   },
   filters: {
-    status: "",
-    sortBy: "popularity",
+    status: "all",
+    sortBy: "latest",
     sortOrder: "desc",
     category: "",
+    searchQuery: "",
   },
 };
 
-// Thunk để fetch danh sách thể loại
 export const fetchCategories = createAsyncThunk(
   "category/fetchCategories",
   async (_, { rejectWithValue }) => {
@@ -71,7 +74,6 @@ export const fetchCategories = createAsyncThunk(
   }
 );
 
-// Thunk để fetch top truyện tuần
 export const fetchTopWeeklyStories = createAsyncThunk(
   "category/fetchTopWeeklyStories",
   async (_, { rejectWithValue }) => {
@@ -88,7 +90,6 @@ export const fetchTopWeeklyStories = createAsyncThunk(
   }
 );
 
-// Keep other thunks as they are...
 export const fetchStoriesByCategory = createAsyncThunk(
   "category/fetchStoriesByCategory",
   async (
@@ -138,37 +139,35 @@ export const fetchStoriesByCategory = createAsyncThunk(
           break;
       }
 
-      console.log(
-        `API response for ${slug}:`,
-        JSON.stringify(response, null, 2)
-      );
+      console.log(`Raw API response for ${slug}:`, JSON.stringify(response, null, 2));
 
-      if (!response.success) {
+      // Kiểm tra cấu trúc response
+      if (!response || typeof response !== "object") {
+        throw new Error(`Response không hợp lệ cho slug: ${slug}`);
+      }
+
+      // Kiểm tra success trong response.data
+      if (!response.data?.success) {
         throw new Error(
-          response.message || `Lấy dữ liệu thất bại cho slug: ${slug}`
+          response.data?.message || `Lấy dữ liệu thất bại cho slug: ${slug}`
         );
       }
 
-      let data = response.data?.data || response.data;
+      // Lấy dữ liệu từ response.data.data.data
+      const data = response.data?.data?.data;
+
+      console.log(`Extracted data for ${slug}:`, data); // Debug log
 
       if (!data || typeof data !== "object") {
-        if (response && typeof response === "object" && "data" in response) {
-          data = response.data;
-        } else {
-          throw new Error(`Cấu trúc dữ liệu không hợp lệ cho slug: ${slug}`);
-        }
+        throw new Error(`Cấu trúc dữ liệu không hợp lệ cho slug: ${slug}`);
       }
 
       if (!data.stories || !Array.isArray(data.stories)) {
-        throw new Error(
-          `Dữ liệu truyện không hợp lệ hoặc thiếu stories cho slug: ${slug}`
-        );
+        throw new Error(`Dữ liệu truyện không hợp lệ hoặc thiếu stories cho slug: ${slug}`);
       }
 
       if (!data.pagination || typeof data.pagination !== "object") {
-        console.warn(
-          `Pagination thiếu cho slug: ${slug}, sử dụng giá trị mặc định`
-        );
+        console.warn(`Pagination thiếu cho slug: ${slug}, sử dụng giá trị mặc định`);
         return {
           stories: data.stories,
           total: data.stories.length,
@@ -198,9 +197,9 @@ export const fetchStoriesByCategory = createAsyncThunk(
       };
     } catch (error: unknown) {
       console.error(`Lỗi khi lấy dữ liệu cho ${slug}:`, error);
-      throw new Error(
-        error instanceof Error ? error.message : `Không thể tải dữ liệu truyện cho slug: ${slug}`
-      );
+      throw error instanceof Error
+        ? error
+        : new Error(`Không thể tải dữ liệu truyện cho slug: ${slug}`);
     }
   }
 );
@@ -250,33 +249,35 @@ export const loadMoreStories = createAsyncThunk(
           break;
       }
 
-      console.log(
-        `Load more response for ${slug}:`,
-        JSON.stringify(response, null, 2)
-      );
+      console.log(`Raw load more response for ${slug}:`, JSON.stringify(response, null, 2));
 
-      if (!response.success) {
+      // Kiểm tra cấu trúc response
+      if (!response || typeof response !== "object") {
+        throw new Error(`Response không hợp lệ cho slug: ${slug}`);
+      }
+
+      // Kiểm tra success trong response.data
+      if (!response.data?.success) {
         throw new Error(
-          response.message || `Tải thêm dữ liệu thất bại cho slug: ${slug}`
+          response.data?.message || `Tải thêm dữ liệu thất bại cho slug: ${slug}`
         );
       }
 
-      let data = response.data?.data || response.data;
+      // Lấy dữ liệu từ response.data.data.data
+      const data = response.data?.data?.data;
+
+      console.log(`Extracted data for ${slug}:`, data); // Debug log
 
       if (!data || typeof data !== "object") {
-        data = response;
+        throw new Error(`Cấu trúc dữ liệu không hợp lệ cho slug: ${slug}`);
       }
 
       if (!data.stories || !Array.isArray(data.stories)) {
-        throw new Error(
-          `Dữ liệu truyện không hợp lệ hoặc thiếu stories cho slug: ${slug}`
-        );
+        throw new Error(`Dữ liệu truyện không hợp lệ hoặc thiếu stories cho slug: ${slug}`);
       }
 
       if (!data.pagination || typeof data.pagination !== "object") {
-        console.warn(
-          `Pagination thiếu cho slug: ${slug}, sử dụng giá trị mặc định`
-        );
+        console.warn(`Pagination thiếu cho slug: ${slug}, sử dụng giá trị mặc định`);
         return {
           stories: data.stories,
           total: data.stories.length,
@@ -306,9 +307,9 @@ export const loadMoreStories = createAsyncThunk(
       };
     } catch (error: unknown) {
       console.error(`Lỗi khi tải thêm dữ liệu cho ${slug}:`, error);
-      throw new Error(
-        error instanceof Error ? error.message : `Không thể tải thêm truyện cho slug: ${slug}`
-      );
+      throw error instanceof Error
+        ? error
+        : new Error(`Không thể tải thêm truyện cho slug: ${slug}`);
     }
   }
 );
@@ -345,7 +346,6 @@ const categorySlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Xử lý fetchCategories
       .addCase(fetchCategories.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -359,21 +359,19 @@ const categorySlice = createSlice({
         state.error =
           (action.payload as string) || "Lỗi khi tải danh sách thể loại";
       })
-      // Xử lý fetchTopWeeklyStories - Store in topWeeklyStories instead of stories
       .addCase(fetchTopWeeklyStories.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchTopWeeklyStories.fulfilled, (state, action) => {
         state.loading = false;
-        state.topWeeklyStories = action.payload; // Store in topWeeklyStories
+        state.topWeeklyStories = action.payload;
       })
       .addCase(fetchTopWeeklyStories.rejected, (state, action) => {
         state.loading = false;
         state.error =
           (action.payload as string) || "Lỗi khi tải top truyện tuần";
       })
-      // Xử lý fetchStoriesByCategory
       .addCase(fetchStoriesByCategory.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -394,7 +392,6 @@ const categorySlice = createSlice({
         state.error =
           action.error.message || "Lỗi không xác định khi tải dữ liệu";
       })
-      // Xử lý loadMoreStories
       .addCase(loadMoreStories.pending, (state) => {
         state.loading = true;
         state.error = null;

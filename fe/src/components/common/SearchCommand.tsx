@@ -1,4 +1,3 @@
-// src/components/common/SearchCommand.tsx
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -97,12 +96,12 @@ export function SearchCommand({ isOpen, onClose }: SearchCommandProps) {
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
       
       {/* Command Panel */}
-      <div className="fixed left-1/2 top-1/2 z-50 w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 transform">
+      <div className="fixed left-1/2 top-16 z-50 w-full max-w-2xl -translate-x-1/2 transform">
         <div className="mx-4 overflow-hidden rounded-xl border bg-popover shadow-2xl">
           {/* Search Input */}
           <div className="flex items-center border-b px-4 py-3">
@@ -129,7 +128,7 @@ export function SearchCommand({ isOpen, onClose }: SearchCommandProps) {
           </div>
 
           {/* Results Content */}
-          <div className="max-h-96 overflow-y-auto">
+          <div className="max-h-[calc(100vh-8rem)] overflow-y-auto">
             {query.trim() && results.length > 0 && (
               <div className="p-2">
                 <div className="mb-2 px-2 text-xs font-medium text-muted-foreground">
@@ -210,7 +209,7 @@ export function SearchCommand({ isOpen, onClose }: SearchCommandProps) {
             {query.trim() && !loading && results.length === 0 && !error && (
               <div className="p-4 text-center">
                 <p className="text-sm text-muted-foreground">
-                  Không tìm thấy kết quả cho &quot;{query}&quot;
+                  Không tìm thấy kết quả cho "{query}"
                 </p>
               </div>
             )}

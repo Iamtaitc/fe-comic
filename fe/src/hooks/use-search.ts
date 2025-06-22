@@ -31,7 +31,7 @@ export function useSearch() {
           setResults([]);
           setError("Không tìm thấy kết quả phù hợp");
         }
-      } catch {
+      } catch (err) {
         if (isCanceled) return;
         setResults([]);
         setError("Đã có lỗi xảy ra. Vui lòng thử lại.");
