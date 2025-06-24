@@ -28,7 +28,7 @@ export interface StoryDetail {
 
 export async function getStoryDetail(slug: string): Promise<StoryDetail> {
   try {
-    const response = await apiClient.get(`/comic/${slug}`);
+    const response = await apiClient.get(`/comics/${slug}`);
     console.log("Detail Response:", response.data); // Log dữ liệu thực tế
     return response.data; // Trả về response.data để khớp với StoryDetail
   } catch (error) {

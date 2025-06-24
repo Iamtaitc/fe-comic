@@ -8,6 +8,7 @@ import { AlertCircle, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
 import { getCategory } from "@/lib/api/comic/category"; 
 import { CategoryObject } from "@/lib/api/comic/types";
+import { getGradientBySlug } from "@/components/category/GradientUtils";
 
 export default function CategoryPage() {
   const [categories, setCategories] = useState<CategoryObject[]>([]);
@@ -17,18 +18,16 @@ export default function CategoryPage() {
   useEffect(() => {
     async function fetchCategories() {
       try {
-        // Gọi API getCategory
         const response = await getCategory();
-        console.log("Raw API Response:", response); // Debug toàn bộ response
+        console.log("Raw API Response:", response);
 
-        // Kiểm tra cấu trúc dữ liệu trả về từ API
         let data: CategoryObject[] = [];
         if (Array.isArray(response)) {
-          console.log("API Response is Array:", response); // Debug mảng trực tiếp
-          data = response; // API trả về mảng trực tiếp
+          console.log("API Response is Array:", response);
+          data = response;
         } else if (response && response.data && Array.isArray(response.data)) {
-          console.log("API Data:", response.data); // Debug dữ liệu trong response.data
-          data = response.data; // API trả về { success: true, data: [...] }
+          console.log("API Data:", response.data);
+          data = response.data;
         } else {
           throw new Error("Dữ liệu API không đúng định dạng: không phải mảng hoặc response.data không phải mảng");
         }
@@ -36,7 +35,6 @@ export default function CategoryPage() {
         setCategories(data);
         setLoading(false);
       } catch (err: any) {
-        // Xử lý lỗi chi tiết hơn
         let errorMessage = "Không thể tải danh sách thể loại. Vui lòng thử lại sau.";
         if (err.response) {
           errorMessage = `Lỗi server: ${err.response.status} - ${err.response.data?.message || "Không rõ"}`;
@@ -84,22 +82,23 @@ export default function CategoryPage() {
                 href={`/category/${category.slug}`}
                 className="block p-6 rounded-lg bg-card hover:bg-accent/50 transition-colors border relative group"
               >
-                <div className="flex items-start gap-4">
+                <div className={`absolute inset-0 bg-gradient-to-r ${getGradientBySlug(category.slug)} opacity-80 rounded-lg z-0 transition-opacity group-hover:opacity-100`}></div>
+                <div className="flex items-start gap-4 relative z-10">
                   <div className="text-4xl">📖</div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-2">
-                      <h2 className="text-xl font-semibold">{category.name}</h2>
-                      <div className="flex items-center gap-1 text-sm font-medium text-primary">
+                      <h2 className="text-xl font-semibold text-white">{category.name}</h2>
+                      <div className="flex items-center gap-1 text-sm font-medium text-white">
                         <BookOpen className="h-4 w-4" />
-                        <span>{category.storyCount || 0}</span>
+                        <span className="mr-8">{category.storyCount || 0}</span>
                       </div>
                     </div>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-white/80">
                       Khám phá các câu chuyện thuộc thể loại {category.name.toLowerCase()}.
                     </p>
                   </div>
                 </div>
-                <div className="absolute top-0 right-0 w-12 h-12 bg-primary/10 rounded-bl-lg flex items-center justify-center text-primary font-bold">
+                <div className="absolute top-0 right-0 w-12 h-12 bg-white/10 rounded-bl-lg flex items-center justify-center text-white font-bold">
                   #{index + 1}
                 </div>
               </Link>

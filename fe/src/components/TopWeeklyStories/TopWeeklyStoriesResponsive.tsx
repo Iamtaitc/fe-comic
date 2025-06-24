@@ -1,4 +1,3 @@
-// fe/src/components/TopWeeklyStoriesResponsive.tsx
 import { GetServerSideProps } from "next";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -26,7 +25,6 @@ const TopWeeklyStoriesResponsive: React.FC<TopWeeklyStoriesResponsiveProps> = ({
   const [isTablet, setIsTablet] = useState(deviceType === "tablet");
   const [mounted, setMounted] = useState(false);
 
-  // Sync server-fetched data with Redux and handle client-side device detection
   useEffect(() => {
     dispatch(setTopWeeklyStories(stories));
     setMounted(true);
@@ -37,6 +35,7 @@ const TopWeeklyStoriesResponsive: React.FC<TopWeeklyStoriesResponsiveProps> = ({
       setIsTablet(width >= 768 && width < 1024);
     };
 
+    console.log("Server-side stories:", stories); // Debug log
     checkDevice();
     window.addEventListener("resize", checkDevice);
 
@@ -74,10 +73,11 @@ const TopWeeklyStoriesResponsive: React.FC<TopWeeklyStoriesResponsiveProps> = ({
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   try {
-    // Fetch top weekly stories using the provided API
     const response = await getTopWeeklyStories();
 
-    if (!response.success || !Array.isArray(response.data.stories)) {
+    console.log("Server-side response:", JSON.stringify(response, null, 2)); // Debug log
+
+    if (!response.data?.success || !response.data?.data?.stories || !Array.isArray(response.data.data.stories)) {
       return {
         props: {
           stories: [],
@@ -87,7 +87,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       };
     }
 
-    const stories = response.data.stories;
+    const stories = response.data.data.stories; // Lấy từ response.data.data.stories
     const deviceType = parseUserAgent(context.req.headers["user-agent"] || "");
 
     return {
@@ -108,7 +108,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 };
 
-// Utility to parse user-agent for device detection
 const parseUserAgent = (userAgent: string): "mobile" | "tablet" | "desktop" => {
   const isMobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
   const isTablet = /Tablet|iPad|PlayBook|Silk|Kindle|Nexus 7|Nexus 10/i.test(userAgent);

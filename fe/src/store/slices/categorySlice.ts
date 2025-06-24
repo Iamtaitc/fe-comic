@@ -79,25 +79,38 @@ export const fetchTopWeeklyStories = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await getTopWeeklyStories();
-      if (!response.success || !Array.isArray(response.data.stories)) {
-        throw new Error("Dữ liệu top truyện tuần không hợp lệ");
+      console.log("Raw response from getTopWeeklyStories:", JSON.stringify(response, null, 2));
+
+      // Kiểm tra chi tiết cấu trúc dữ liệu
+      console.log("Data structure:", {
+        success: response.data?.success,
+        message: response.data?.message,
+        dataExists: !!response.data,
+        storiesExists: !!response.data?.data?.stories,
+        isArray: Array.isArray(response.data?.data?.stories),
+        fullData: JSON.stringify(response.data, null, 2),
+      });
+
+      if (!response.data?.success) {
+        throw new Error(`Yêu cầu không thành công: ${response.data?.message || 'Không có thông báo lỗi'}`);
       }
-      return response.data.stories;
+      if (!response.data?.data?.stories || !Array.isArray(response.data.data.stories)) {
+        throw new Error("Dữ liệu stories không hợp lệ hoặc không tồn tại: " + JSON.stringify(response.data?.data));
+      }
+
+      return response.data.data.stories; // Lấy từ response.data.data.stories
     } catch (error: unknown) {
       console.error("Lỗi khi lấy top truyện tuần:", error);
-      return rejectWithValue(error instanceof Error ? error.message : "Không thể tải top truyện tuần");
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Không thể tải top truyện tuần"
+      );
     }
   }
 );
-
 export const fetchStoriesByCategory = createAsyncThunk(
   "category/fetchStoriesByCategory",
   async (
-    {
-      slug,
-      page = 1,
-      filters = {},
-    }: { slug: string; page?: number; filters?: Record<string, unknown> },
+    { slug, page = 1, filters = {} }: { slug: string; page?: number; filters?: Record<string, unknown> },
     { getState }
   ) => {
     const state = getState() as { category: CategoryState };
@@ -141,22 +154,19 @@ export const fetchStoriesByCategory = createAsyncThunk(
 
       console.log(`Raw API response for ${slug}:`, JSON.stringify(response, null, 2));
 
-      // Kiểm tra cấu trúc response
       if (!response || typeof response !== "object") {
         throw new Error(`Response không hợp lệ cho slug: ${slug}`);
       }
 
-      // Kiểm tra success trong response.data
       if (!response.data?.success) {
         throw new Error(
           response.data?.message || `Lấy dữ liệu thất bại cho slug: ${slug}`
         );
       }
 
-      // Lấy dữ liệu từ response.data.data.data
       const data = response.data?.data?.data;
 
-      console.log(`Extracted data for ${slug}:`, data); // Debug log
+      console.log(`Extracted data for ${slug}:`, data);
 
       if (!data || typeof data !== "object") {
         throw new Error(`Cấu trúc dữ liệu không hợp lệ cho slug: ${slug}`);
@@ -314,7 +324,7 @@ export const loadMoreStories = createAsyncThunk(
   }
 );
 
-const categorySlice = createSlice({
+export const categorySlice = createSlice({
   name: "category",
   initialState,
   reducers: {

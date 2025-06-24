@@ -1,3 +1,4 @@
+//fe\src\components\category\CategoryList.tsx
 "use client";
 
 import { motion } from "framer-motion";

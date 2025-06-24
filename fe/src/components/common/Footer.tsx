@@ -1,4 +1,3 @@
-//fe\src\components\common\Footer.tsx
 "use client";
 
 import { useEffect } from "react";
@@ -30,22 +29,22 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="w-full border-t bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-12 footer-section">
+    <footer className="w-full border-t bg-black-900 py-12 footer-section">
       <div className="container grid gap-8 sm:grid-cols-2 lg:grid-cols-4 footer-columns">
         {/* Logo and About */}
         <div className="flex flex-col gap-4 footer-column">
           <Logo className="h-8 w-auto" />
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-gray-400">
             Đọc truyện tranh online miễn phí với kho truyện đồ sộ và cập nhật liên tục.
           </p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-gray-400">
             Cảm ơn các nguồn API cung cấp dữ liệu. Chúng tôi xin lỗi nếu có bất kỳ nội dung nào chưa được cấp phép.
           </p>
           <div className="flex gap-3">
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full social-link hover:bg-red-300 hover:text-red-500"
+              className="rounded-full social-link hover:bg-red-600 hover:text-white"
               asChild
             >
               <Link href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
@@ -56,7 +55,7 @@ export default function Footer() {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full social-link hover:bg-red-300 hover:text-red-500"
+              className="rounded-full social-link hover:bg-red-600 hover:text-white"
               asChild
             >
               <Link href="mailto:contact@subtruyen.vn" target="_blank">
@@ -67,7 +66,7 @@ export default function Footer() {
             <Button
               asChild
               size="sm"
-              className="rounded-full hover:bg-red-300 hover:text-red-500"
+              className="rounded-full hover:bg-red-600 hover:text-white"
             >
               <Link href="https://www.tiktok.com" target="_blank" rel="noopener noreferrer">
                 <span className="h-5 w-5 flex items-center justify-center">
@@ -79,7 +78,7 @@ export default function Footer() {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full social-link hover:bg-red-300 hover:text-red-500"
+              className="rounded-full social-link hover:bg-red-600 hover:text-white"
               asChild
             >
               <Link href="https://www.youtube.com" target="_blank" rel="noopener noreferrer">
@@ -92,25 +91,25 @@ export default function Footer() {
 
         {/* Navigation - Khám phá */}
         <div className="footer-column">
-          <h3 className="mb-4 text-lg font-semibold">Khám phá</h3>
+          <h3 className="mb-4 text-lg font-semibold text-white">Khám phá</h3>
           <ul className="space-y-2 text-sm">
             <li>
-              <Link href="/latest" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/latest" className="text-gray-400 hover:text-white transition-colors">
                 Truyện mới cập nhật
               </Link>
             </li>
             <li>
-              <Link href="/hot" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/hot" className="text-gray-400 hover:text-white transition-colors">
                 Truyện hot
               </Link>
             </li>
             <li>
-              <Link href="/completed" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/completed" className="text-gray-400 hover:text-white transition-colors">
                 Truyện hoàn thành
               </Link>
             </li>
             <li>
-              <Link href="/category" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/category" className="text-gray-400 hover:text-white transition-colors">
                 Thể loại
               </Link>
             </li>
@@ -119,25 +118,25 @@ export default function Footer() {
 
         {/* Navigation - Liên kết */}
         <div className="footer-column">
-          <h3 className="mb-4 text-lg font-semibold">Liên kết</h3>
+          <h3 className="mb-4 text-lg font-semibold text-white">Liên kết</h3>
           <ul className="space-y-2 text-sm">
             <li>
-              <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/about" className="text-gray-400 hover:text-white transition-colors">
                 Giới thiệu
               </Link>
             </li>
             <li>
-              <Link href="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/terms" className="text-gray-400 hover:text-white transition-colors">
                 Điều khoản sử dụng
               </Link>
             </li>
             <li>
-              <Link href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">
                 Chính sách bảo mật
               </Link>
             </li>
             <li>
-              <Link href="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/contact" className="text-gray-400 hover:text-white transition-colors">
                 Liên hệ
               </Link>
             </li>
@@ -146,12 +145,12 @@ export default function Footer() {
 
         {/* App Download */}
         <div className="footer-column">
-          <h3 className="mb-4 text-lg font-semibold">Tải ứng dụng</h3>
-          <p className="text-sm text-muted-foreground mb-4">
+          <h3 className="mb-4 text-lg font-semibold text-white">Tải ứng dụng</h3>
+          <p className="text-sm text-gray-400 mb-4">
             Tải ứng dụng để có trải nghiệm tốt nhất trên điện thoại
           </p>
           <div className="flex flex-col gap-2">
-            <Button variant="outline" className="w-full justify-start gap-2 hover:bg-accent">
+            <Button variant="outline" className="w-full justify-start gap-2 hover:bg-gray-700 hover:text-white border-gray-600">
               <svg viewBox="0 0 24 24" className="h-5 w-5">
                 <path
                   fill="currentColor"
@@ -160,7 +159,7 @@ export default function Footer() {
               </svg>
               <span>App Store</span>
             </Button>
-            <Button variant="outline" className="w-full justify-start gap-2 hover:bg-accent">
+            <Button variant="outline" className="w-full justify-start gap-2 hover:bg-gray-700 hover:text-white border-gray-600">
               <svg viewBox="0 0 24 24" className="h-5 w-5">
                 <path
                   fill="currentColor"
@@ -172,8 +171,8 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      <div className="container mt-8 border-t pt-8">
-        <p className="text-center text-sm text-muted-foreground">
+      <div className="container mt-8 border-t pt-8 border-gray-700">
+        <p className="text-center text-sm text-gray-400">
           © {new Date().getFullYear()} Sub Truyện. Tất cả quyền được bảo lưu.
         </p>
       </div>

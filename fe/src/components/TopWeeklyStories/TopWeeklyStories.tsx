@@ -1,4 +1,3 @@
-// fe/src/components/TopWeeklyStories/TopWeeklyStories.tsx
 "use client";
 
 import { useEffect, useRef, useCallback } from "react";
@@ -31,7 +30,7 @@ const TopWeeklyStories: React.FC<TopWeeklyStoriesProps> = ({ className = "" }) =
     const ctx = gsap.context(() => {
       gsap.fromTo(
         titleRef.current,
-        { opacity: 0, y: -50, scale: 0.8 },
+        { opacity: 0, y: -20, scale: 0.9 }, // Điều chỉnh y: -20 và scale: 0.9
         { opacity: 1, y: 0, scale: 1, duration: 1, ease: "power3.out" }
       );
 
@@ -54,9 +53,9 @@ const TopWeeklyStories: React.FC<TopWeeklyStoriesProps> = ({ className = "" }) =
         if (card) {
           const onEnter = () =>
             gsap.to(card, {
-              scale: 1.02, // Giảm từ 1.05 xuống 1.02
-              y: -2, // Giảm từ -10 xuống -2
-              boxShadow: "0 15px 30px rgba(0,0,0,0.2)", // Giảm shadow
+              scale: 1.02,
+              y: -2,
+              boxShadow: "0 15px 30px rgba(0,0,0,0.2)",
               duration: 0.3,
               ease: "power2.out",
             });
@@ -129,7 +128,7 @@ const TopWeeklyStories: React.FC<TopWeeklyStoriesProps> = ({ className = "" }) =
       <div className="container mx-auto px-4 max-w-7xl relative">
         <h1
           ref={titleRef}
-          className="text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+          className="text-4xl md:text-5xl font-bold text-center mb-16 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent min-h-[120px] leading-[1.3]"
         >
           Top 10 truyện hot hôm nay
         </h1>

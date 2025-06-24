@@ -1,3 +1,4 @@
+//fe\src\components\home\hero-section.tsx
 "use client";
 
 import { useState, useEffect } from "react";

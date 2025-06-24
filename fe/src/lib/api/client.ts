@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseURL = 'https://4093-115-76-54-60.ngrok-free.app/api/v1';
+const baseURL = 'https://bfc0-115-76-54-60.ngrok-free.app/api/v1';
 
 export const apiClient = axios.create({
   baseURL,
@@ -31,6 +31,7 @@ apiClient.interceptors.request.use(
 // Response interceptor
 apiClient.interceptors.response.use(
   (response) => {
+    console.log("Raw Response Data from Server:", response.data);
     console.log('Response:', {
       url: response.config.url,
       status: response.status,

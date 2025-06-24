@@ -1,3 +1,4 @@
+//fe\src\components\home\StoriesSection.tsx
 "use client";
 
 import { useState, useEffect, memo } from "react";
@@ -42,24 +43,27 @@ export function StoriesSection({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetchStories({ page: 1, limit: 10 });
-        setStories(
-          res.success && res.data?.data?.stories ? res.data.data.stories : []
-        );
-      } catch (err) {
-        console.error(`Failed to fetch ${title.toLowerCase()}:`, err);
-        setError(`Không thể tải ${title.toLowerCase()}. Vui lòng thử lại sau.`);
-      } finally {
-        setLoading(false);
-      }
-    };
+useEffect(() => {
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetchStories({ page: 1, limit: 10 });
+      console.log(`API Response for ${title}:`, JSON.stringify(res, null, 2)); // Log chi tiết
+      console.log(`Stories Data for ${title}:`, res.data?.data?.stories); // Log mảng stories
+      setStories(
+        res.success && res.data?.data?.stories ? res.data.data.stories : []
+      );
+      console.log(`Updated Stories State for ${title}:`, res.success && res.data?.data?.stories ? res.data.data.stories : []);
+    } catch (err) {
+      console.error(`Failed to fetch ${title.toLowerCase()}:`, err);
+      setError(`Không thể tải ${title.toLowerCase()}. Vui lòng thử lại sau.`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchData();
+  fetchData();
 
     // GSAP animations
     gsap.fromTo(

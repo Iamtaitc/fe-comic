@@ -1,6 +1,7 @@
+// fe\app\page.tsx
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "../src/store/hooks";
 import { fetchHomeData } from "../src/store/slices/homeSlice";
 import { HeroSection } from "../src/components/home/hero-section";
@@ -9,13 +10,11 @@ import { StoriesSection } from "../src/components/home/StoriesSection";
 import TopWeeklyStoriesResponsive from "../src/components/TopWeeklyStories/TopWeeklyStoriesResponsive";
 import { Flame, Clock, CheckCircle, Calendar } from "lucide-react";
 import {
-  getPopularStories,
-} from "@/lib/api/comic/popular";
-import {
-    getOngoingStories,
-    getCompletedStories,
-    getUpcomingStories,
+  getOngoingStories,
+  getCompletedStories,
+  getUpcomingStories,
 } from "@/lib/api/comic/status";
+import { getPopularStories } from "@/lib/api/comic/popular";
 import { Skeleton } from "../src/components/ui/skeleton";
 import {
   Alert,
@@ -23,7 +22,8 @@ import {
   AlertDescription,
 } from "../src/components/ui/alert";
 import { AlertCircle } from "lucide-react";
- 
+import { fetchTopWeeklyStories } from "@/store/slices/categorySlice";
+
 export default function Home() {
   const dispatch = useAppDispatch();
   const { popularStories, categories, loading, error } = useAppSelector(
@@ -32,9 +32,62 @@ export default function Home() {
 
   useEffect(() => {
     dispatch(fetchHomeData());
+    dispatch(fetchTopWeeklyStories());
   }, [dispatch]);
 
   console.log("Redux State:", { popularStories, categories, loading, error });
+
+  const fetchPopularStories = useCallback(async (params) => {
+    const response = await getPopularStories(params || {});
+    console.log("Popular Stories Raw Response:", response.data);
+    return {
+      success: response.data.success,
+      data: {
+        data: {
+          stories: response.data.data.data.stories || [], // Sửa lại để lấy response.data.data.data.stories
+        },
+      },
+    };
+  }, []);
+
+  const fetchOngoingStories = useCallback(async (params) => {
+    const response = await getOngoingStories(params || {});
+    console.log("Ongoing Stories Raw Response:", response.data);
+    return {
+      success: response.data.success,
+      data: {
+        data: {
+          stories: response.data.data.data.stories || [], // Sửa lại để lấy response.data.data.data.stories
+        },
+      },
+    };
+  }, []);
+
+  const fetchCompletedStories = useCallback(async (params) => {
+    const response = await getCompletedStories(params || {});
+    console.log("Completed Stories Raw Response:", response.data);
+    return {
+      success: response.data.success,
+      data: {
+        data: {
+          stories: response.data.data.data.stories || [], // Sửa lại để lấy response.data.data.data.stories
+        },
+      },
+    };
+  }, []);
+
+  const fetchUpcomingStories = useCallback(async (params) => {
+    const response = await getUpcomingStories(params || {});
+    console.log("Upcoming Stories Raw Response:", response.data);
+    return {
+      success: response.data.success,
+      data: {
+        data: {
+          stories: response.data.data.data.stories || [], // Sửa lại để lấy response.data.data.data.stories
+        },
+      },
+    };
+  }, []);
 
   if (loading) {
     return (
@@ -148,26 +201,26 @@ export default function Home() {
 
       {/* Stories Sections */}
       <StoriesSection
-        fetchStories={(params) => getPopularStories(params || {})}
+        fetchStories={fetchPopularStories}
         title="Truyện nổi bật"
         icon={<Flame />}
         iconMotion="animate-pulse text-red-500"
         iconClass="h-6 w-6 text-red-500"
-        link="/"
+        link="/popular"
         titleGradient="bg-gradient-to-r from-red-500 to-white"
       />
       <StoriesSection
-        fetchStories={(params) => getOngoingStories(params || {})}
+        fetchStories={fetchOngoingStories}
         title="Truyện đang phát hành"
         icon={<Clock />}
         iconMotion="animate-pulse text-blue-500"
         iconClass="h-6 w-6 text-blue-500"
-        link="/completed"
+        link="/ongoing"
         titleGradient="bg-gradient-to-r from-blue-500 to-white"
       />
-      <TopWeeklyStoriesResponsive />
+      <TopWeeklyStoriesResponsive stories={[]} deviceType={"mobile"} />
       <StoriesSection
-        fetchStories={(params) => getCompletedStories(params || {})}
+        fetchStories={fetchCompletedStories}
         title="Truyện đã hoàn thành"
         icon={<CheckCircle />}
         iconMotion="animate-pulse text-green-500"
@@ -176,7 +229,7 @@ export default function Home() {
         titleGradient="bg-gradient-to-r from-green-500 to-white"
       />
       <StoriesSection
-        fetchStories={(params) => getUpcomingStories(params || {})}
+        fetchStories={fetchUpcomingStories}
         title="Truyện sắp ra mắt"
         icon={<Calendar />}
         iconMotion="animate-pulse text-purple-500"

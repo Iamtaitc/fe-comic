@@ -113,6 +113,3 @@ export function CategoryList({ categories }: CategoryListProps) {
     </section>
   )
 }
-
-
-

@@ -1,11 +1,10 @@
-//fe\src\components\category\CategoryHeader.tsx
-
 "use client";
 import { useEffect, useRef } from 'react';
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, TrendingUp, Clock } from "lucide-react";
 import { gsap } from 'gsap';
+import { getGradientBySlug } from "./GradientUtils";
 
 interface CategoryHeaderProps {
   title: string;
@@ -20,18 +19,6 @@ export function CategoryHeader({
   totalStories, 
   slug 
 }: CategoryHeaderProps) {
-  // Lấy gradient color dựa trên slug
-  const getGradientBySlug = (slug: string) => {
-    const gradients: Record<string, string> = {
-      "xuyen-khong": "from-purple-600 via-pink-600 to-blue-600",
-      "chuyen-sinh": "from-blue-600 via-cyan-600 to-teal-600", 
-      "manga": "from-orange-600 via-red-600 to-pink-600",
-      "16": "from-rose-600 via-pink-600 to-purple-600",
-      default: "from-primary via-primary/80 to-primary/60"
-    };
-    return gradients[slug] || gradients.default;
-  };
-
   const gradient = getGradientBySlug(slug);
   const cosmicFlowRef = useRef<HTMLDivElement>(null);
   const particlesRef = useRef<HTMLDivElement>(null);
@@ -42,7 +29,6 @@ export function CategoryHeader({
     
     if (!container || !particleContainer) return;
 
-    // Generate particles
     const particleCount = 30;
     const particles: HTMLDivElement[] = [];
     
@@ -57,7 +43,6 @@ export function CategoryHeader({
       particles.push(particle);
     }
 
-    // Animate particles with wave-like motion
     particles.forEach((particle, index) => {
       gsap.to(particle, {
         x: () => Math.sin(index * 0.5 + Date.now() * 0.001) * 50,
@@ -72,7 +57,6 @@ export function CategoryHeader({
       });
     });
 
-    // Mouse interaction
     const handleMouseMove = (e: MouseEvent) => {
       const rect = container.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
@@ -101,7 +85,6 @@ export function CategoryHeader({
 
     container.addEventListener('mousemove', handleMouseMove);
 
-    // Cleanup
     return () => {
       container.removeEventListener('mousemove', handleMouseMove);
       particles.forEach((particle) => particle.remove());
@@ -110,7 +93,6 @@ export function CategoryHeader({
 
   return (
     <div className={`relative py-16 bg-gradient-to-r ${gradient} overflow-hidden`}>
-      {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-10 left-10 w-32 h-32 rounded-full bg-white/20 animate-pulse" />
         <div className="absolute top-32 right-20 w-24 h-24 rounded-full bg-white/10 animate-pulse delay-1000" />
@@ -118,30 +100,16 @@ export function CategoryHeader({
         <div className="absolute bottom-10 right-10 w-28 h-28 rounded-full bg-white/10 animate-pulse delay-1500" />
       </div>
 
-      {/* Animated Background Lines */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
           className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"
-          animate={{
-            x: ["-100%", "100%"],
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: "linear",
-          }}
+          animate={{ x: ["-100%", "100%"] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
         />
         <motion.div
           className="absolute bottom-0 right-0 w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"
-          animate={{
-            x: ["100%", "-100%"],
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "linear",
-            delay: 1,
-          }}
+          animate={{ x: ["100%", "-100%"] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "linear", delay: 1 }}
         />
       </div>
 
@@ -189,7 +157,6 @@ export function CategoryHeader({
               </Badge>
             </motion.div>
 
-            {/* Scroll Indicator */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -198,26 +165,13 @@ export function CategoryHeader({
             >
               <span className="text-white/70 text-sm mb-2">Khám phá thêm</span>
               <motion.div
-                animate={{
-                  y: [0, 8, 0],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
+                animate={{ y: [0, 8, 0] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                 className="w-6 h-10 border-2 border-white/40 rounded-full flex justify-center"
               >
                 <motion.div
-                  animate={{
-                    y: [0, 12, 0],
-                    opacity: [0, 1, 0],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
+                  animate={{ y: [0, 12, 0], opacity: [0, 1, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                   className="w-1 h-3 bg-white/60 rounded-full mt-2"
                 />
               </motion.div>
@@ -226,12 +180,8 @@ export function CategoryHeader({
         </div>
       </div>
 
-      {/* Cosmic Flow Effect */}
       <div ref={cosmicFlowRef} className="absolute bottom-0 left-0 right-0 h-32 overflow-hidden z-20">
-        {/* Particle Container */}
         <div ref={particlesRef} className="absolute bottom-0 left-0 right-0 h-full"></div>
-        
-        {/* Gradient Overlay for Smooth Transition */}
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent z-30"></div>
       </div>
 

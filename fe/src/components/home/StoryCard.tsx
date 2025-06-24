@@ -1,3 +1,4 @@
+//fe\src\components\home\StoryCard.tsx:
 "use client";
 
 import { useState } from "react";
