@@ -1,191 +1,307 @@
-//fe\src\components\home\StoriesSection.tsx
 "use client";
 
-import { useState, useEffect, memo } from "react";
+import { useEffect, memo, useCallback, useMemo } from "react";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { StoryObject } from "@/lib/api/comic/types";
-import { StoryCard } from "./StoryCard";
-import { motion } from "framer-motion";
+import { UnknownAction } from "@reduxjs/toolkit";
+import { motion, AnimatePresence } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { gsap } from "gsap";
+import dynamic from "next/dynamic";
 
-const MemoizedStoryCard = memo(StoryCard);
+// 🎯 Lazy load StoryCard - mobile optimization
+const StoryCard = dynamic(() => import("./StoryCard").then(mod => ({ default: mod.StoryCard })), {
+  loading: () => (
+    <div className="manga-card animate-pulse">
+      <div className="manga-cover aspect-[3/4] bg-gray-200 rounded-lg" />
+      <div className="p-2 space-y-2">
+        <div className="h-4 bg-gray-200 rounded" />
+        <div className="h-3 bg-gray-200 rounded w-16" />
+      </div>
+    </div>
+  ),
+  ssr: false
+});
 
+// 📱 Mobile-first animation variants - optimized
+const animations = {
+  container: {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        duration: 0.2,
+        staggerChildren: 0.05,
+        delayChildren: 0.1
+      }
+    }
+  },
+  title: {
+    hidden: { opacity: 0, y: 8 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.3, ease: "easeOut" }
+    }
+  },
+  card: {
+    hidden: { opacity: 0, y: 12 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.25, ease: "easeOut" }
+    }
+  },
+  button: {
+    hidden: { opacity: 0, scale: 0.95 },
+    show: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.25, ease: "easeOut", delay: 0.15 }
+    }
+  }
+};
+
+// 🎨 Memoized components
+const LoadingSkeleton = memo(({ count = 6 }: { count?: number }) => (
+  <motion.div
+    className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+    variants={animations.container}
+    initial="hidden"
+    animate="show"
+  >
+    {Array.from({ length: count }, (_, i) => (
+      <motion.div 
+        key={`skeleton-${i}`}
+        variants={animations.card}
+        className="manga-card"
+      >
+        <Skeleton className="manga-cover aspect-[3/4] rounded-lg" />
+        <div className="p-2 space-y-2">
+          <Skeleton className="h-4 w-full rounded" />
+          <Skeleton className="h-3 w-16 rounded" />
+          <div className="flex gap-1">
+            <Skeleton className="h-3 w-10 rounded" />
+            <Skeleton className="h-3 w-10 rounded" />
+          </div>
+        </div>
+      </motion.div>
+    ))}
+  </motion.div>
+));
+
+const ErrorAlert = memo(({ error, onRetry }: { error: string; onRetry?: () => void }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 8 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.2 }}
+  >
+    <Alert variant="destructive" className="border-red-200 bg-red-50">
+      <AlertDescription className="text-sm">
+        {error}
+        {onRetry && (
+          <button
+            onClick={onRetry}
+            className="ml-2 underline hover:no-underline font-medium"
+          >
+            Thử lại
+          </button>
+        )}
+      </AlertDescription>
+    </Alert>
+  </motion.div>
+));
+
+const EmptyState = memo(({ title }: { title: string }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 8 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.2 }}
+  >
+    <Alert className="border-gray-200 bg-gray-50">
+      <AlertDescription className="text-sm text-gray-600">
+        Không có {title.toLowerCase()} nào hiện tại.
+      </AlertDescription>
+    </Alert>
+  </motion.div>
+));
+
+// Add display names
+LoadingSkeleton.displayName = 'LoadingSkeleton';
+ErrorAlert.displayName = 'ErrorAlert';
+EmptyState.displayName = 'EmptyState';
+
+// 🔑 Remove local cache - using Redux instead
+import { RootState } from "@/store/store";
 interface StoriesSectionProps {
-  fetchStories: (params?: { page?: number; limit?: number }) => Promise<{
-    success: boolean;
-    data?: {
-      data?: {
-        stories: StoryObject[];
-      };
-    };
-  }>;
+  sectionKey: keyof RootState['home']['sections']; // Redux section key
   title: string;
   icon: React.ReactNode;
   iconClass: string;
   link: string;
   titleGradient: string;
   iconMotion: string;
+  limit?: number;
+  cacheKey?: string;
+  fetchAction: () => UnknownAction; // Redux action
 }
 
+
 export function StoriesSection({
-  fetchStories,
+  sectionKey,
   title,
   icon,
   iconClass,
   link,
   titleGradient,
   iconMotion,
+  limit = 10,
+  cacheKey,
+  fetchAction
 }: StoriesSectionProps) {
-  const [stories, setStories] = useState<StoryObject[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+  
+  // 🔑 Redux state selector
+  const { stories, loading, error, lastFetched } = useAppSelector(
+    (state) => state.home.sections[sectionKey]
+  );
 
-useEffect(() => {
-  const fetchData = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetchStories({ page: 1, limit: 10 });
-      console.log(`API Response for ${title}:`, JSON.stringify(res, null, 2)); // Log chi tiết
-      console.log(`Stories Data for ${title}:`, res.data?.data?.stories); // Log mảng stories
-      setStories(
-        res.success && res.data?.data?.stories ? res.data.data.stories : []
-      );
-      console.log(`Updated Stories State for ${title}:`, res.success && res.data?.data?.stories ? res.data.data.stories : []);
-    } catch (err) {
-      console.error(`Failed to fetch ${title.toLowerCase()}:`, err);
-      setError(`Không thể tải ${title.toLowerCase()}. Vui lòng thử lại sau.`);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // 📱 Mobile-optimized display stories
+  const displayStories = useMemo(() => {
+    return stories.slice(0, limit);
+  }, [stories, limit]);
 
-  fetchData();
-
-    // GSAP animations
-    gsap.fromTo(
-      ".section-title",
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
-    );
-    gsap.fromTo(
-      ".story-card",
-      { opacity: 0, y: 30 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: "power2.out",
-        delay: 0.5,
+  // 🔄 Smart fetch with Redux caching
+  const handleFetch = useCallback(async (force = false) => {
+    const now = Date.now();
+    const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+    
+    // Skip if recently fetched and not forced
+    if (!force && lastFetched && (now - lastFetched) < CACHE_DURATION) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[${title}] Using cached Redux data`);
       }
-    );
-    gsap.fromTo(
-      ".view-all-button",
-      { opacity: 0, scale: 0.9 },
-      { opacity: 1, scale: 1, duration: 0.8, ease: "bounce.out", delay: 0.7 }
-    );
-  }, [fetchStories, title]);
+      return;
+    }
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { duration: 0.3 } },
-  };
+    dispatch(fetchAction());
+  }, [dispatch, fetchAction, title, lastFetched]);
 
-  const item = {
-    hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { duration: 0.2 } },
-  };
+  // 🎯 Effect with smart caching
+  useEffect(() => {
+    handleFetch();
+  }, [handleFetch]);
 
+  // 🔄 Retry function
+  const handleRetry = useCallback(() => {
+    handleFetch(true); // Force refresh
+  }, [handleFetch]);
+
+  // 🎨 Render stories grid - mobile optimized
+  const renderStoriesGrid = () => (
+    <motion.div
+      className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+      variants={animations.container}
+      initial="hidden"
+      animate="show"
+    >
+      {displayStories.map((story: StoryObject, index: number) => (
+        <motion.div 
+          key={story._id}
+          variants={animations.card}
+          className="story-card"
+        >
+          <StoryCard 
+            story={story} 
+            priority={index < 4} // First 4 items priority for mobile
+            loading="lazy"
+          />
+        </motion.div>
+      ))}
+    </motion.div>
+  );
+
+  // 🎨 Main content renderer
   const renderContent = () => {
-    if (loading) {
-      return (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {Array(5)
-            .fill(0)
-            .map((_, i) => (
-              <div key={i} className="manga-card">
-                <div className="manga-cover">
-                  <Skeleton className="absolute inset-0" />
-                </div>
-                <div className="p-3">
-                  <Skeleton className="h-5 w-full" />
-                  <Skeleton className="mt-2 h-4 w-20" />
-                  <div className="mt-2 flex gap-1">
-                    <Skeleton className="h-4 w-12" />
-                    <Skeleton className="h-4 w-12" />
-                  </div>
-                </div>
-              </div>
-            ))}
-        </div>
-      );
+    if (loading && displayStories.length === 0) {
+      return <LoadingSkeleton count={limit > 10 ? 10 : limit} />;
     }
 
     if (error) {
-      return (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      );
+      return <ErrorAlert error={error} onRetry={handleRetry} />;
     }
 
-    if (stories.length === 0) {
-      return (
-        <Alert>
-          <AlertDescription>
-            Không có {title.toLowerCase()} nào hiện tại.
-          </AlertDescription>
-        </Alert>
-      );
+    if (displayStories.length === 0) {
+      return <EmptyState title={title} />;
     }
 
-    return (
-      <motion.div
-        className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
-        variants={container}
-        initial="hidden"
-        animate="show"
-      >
-        {stories.slice(0, 10).map((story, index) => (
-          <motion.div key={story._id} variants={item} className="story-card">
-            <MemoizedStoryCard story={story} priority={index < 5} />
-          </motion.div>
-        ))}
-      </motion.div>
-    );
+    return renderStoriesGrid();
   };
 
   return (
-    <section className="py-12">
-      <div className="container">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-          <h2
-            className={`text-xl md:text-2xl font-bold flex items-center gap-2 section-title ${titleGradient} bg-clip-text text-transparent`}>
-            <span className={iconClass}>{icon}</span>
+    <section className="py-8 md:py-12">
+      <div className="container px-4">
+        {/* 📱 Mobile-first header */}
+        <div className="flex flex-col space-y-4 mb-6 md:flex-row md:items-center md:justify-between md:space-y-0 md:mb-8">
+          <motion.h2
+            className={`text-lg md:text-2xl font-bold flex items-center gap-2 ${titleGradient} bg-clip-text text-transparent`}
+            variants={animations.title}
+            initial="hidden"
+            animate="show"
+          >
+            <span className={`${iconClass} text-base md:text-xl`}>{icon}</span>
             {title}
-          </h2>
-          <div className="mt-4 md:mt-0 view-all-button">
+          </motion.h2>
+          
+          <motion.div
+            variants={animations.button}
+            initial="hidden"
+            animate="show"
+          >
             <Button
               asChild
               variant="outline"
-              className="px-6 py-2 border-none hover:text-red-200">
+              size="sm"
+              className="px-4 py-2 text-sm border-none hover:text-red-200 md:px-6"
+            >
               <Link href={link}>
                 Xem tất cả
-                <motion.div
-                  className={`inline-block ${iconMotion}`}
-                  animate={{ x: [0, 4, 0] }}
-                  transition={{ repeat: Infinity, duration: 1.5 }}>
+                <motion.span
+                  className={`inline-block ml-1 ${iconMotion}`}
+                  animate={{ x: [0, 3, 0] }}
+                  transition={{ 
+                    repeat: Infinity, 
+                    duration: 1.5,
+                    ease: "easeInOut"
+                  }}
+                >
                   →
-                </motion.div>
+                </motion.span>
               </Link>
             </Button>
-          </div>
+          </motion.div>
         </div>
-        {renderContent()}
+        
+        {/* 🎨 Content with loading overlay */}
+        <div className="relative">
+          <AnimatePresence mode="wait">
+            {renderContent()}
+          </AnimatePresence>
+          
+          {/* 📱 Loading overlay for refresh */}
+          {loading && displayStories.length > 0 && (
+            <motion.div
+              className="absolute inset-0 bg-white/50 backdrop-blur-sm rounded-lg flex items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div className="w-6 h-6 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+            </motion.div>
+          )}
+        </div>
       </div>
     </section>
   );

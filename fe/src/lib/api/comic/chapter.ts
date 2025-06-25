@@ -1,5 +1,4 @@
 import { apiClient } from '../client';
-import { StoryObject } from './types';
 
 export interface ChapterDetail {
   success: boolean;

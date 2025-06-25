@@ -1,3 +1,5 @@
+
+//fe\src\store\slices\storySlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { getStoryDetail } from "@/lib/api/comic/detail";
 import { getChapterDetail } from "@/lib/api/comic/chapter";

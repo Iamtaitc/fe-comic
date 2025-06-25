@@ -31,7 +31,7 @@ export interface StoryList {
   success: boolean;
   message: string;
   data: {
-    stories: any;
+    stories: StoryObject[];
     success: boolean;
     status: number;
     message: string;

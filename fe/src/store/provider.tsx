@@ -2,22 +2,29 @@
 'use client';
 import { useRef } from 'react';
 import { Provider } from 'react-redux';
-import { getStore, AppStore } from './store';
+import { makeStore, AppStore } from './store';
 
-export function ReduxProvider({ children, preloadedState }: { children: React.ReactNode, preloadedState?: any }) {
-   const storeRef = useRef<AppStore | null>(null);
+export function ReduxProvider({ 
+  children, 
+  preloadedState 
+}: { 
+  children: React.ReactNode;
+  preloadedState?: unknown;
+}) {
+  const storeRef = useRef<AppStore | undefined>(undefined);
   
+  // 🔑 Chỉ tạo store một lần duy nhất
   if (!storeRef.current) {
-    // Tạo store instance và preload state nếu có
-    storeRef.current = getStore();
+    storeRef.current = makeStore();
     
+    // 🔑 Preload state ngay khi tạo store
     if (preloadedState) {
-      // Dispatch action để hydrate state từ server
       storeRef.current.dispatch({
         type: 'HYDRATE',
         payload: preloadedState
       });
     }
   }
+
   return <Provider store={storeRef.current}>{children}</Provider>;
 }
