@@ -9,11 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { BookOpen, ChevronRight, Star, Pause, Play } from "lucide-react";
 import { StoryObject } from "@/lib/api/comic/types";
 
-// 🔑 Constants
 const CAROUSEL_CONFIG = {
-  AUTO_PLAY_INTERVAL: 5000,
-  FEATURED_STORIES_LIMIT: 5,
-  ANIMATION_DURATION: 1,
+  AUTO_PLAY_INTERVAL: 9000,
+  FEATURED_STORIES_LIMIT: 7,
+  ANIMATION_DURATION: 0.5,
 } as const;
 
 const MOTION_VARIANTS = {
@@ -22,7 +21,6 @@ const MOTION_VARIANTS = {
   exit: { opacity: 0, x: -50 },
 } as const;
 
-// 🎯 Custom Hook for Carousel Logic
 const useCarousel = (
   itemCount: number,
   autoPlayInterval: number = CAROUSEL_CONFIG.AUTO_PLAY_INTERVAL
@@ -47,7 +45,6 @@ const useCarousel = (
     setIsAutoPlaying((prev) => !prev);
   }, []);
 
-  // 🔑 Auto-play management
   useEffect(() => {
     if (isAutoPlaying && itemCount > 1) {
       intervalRef.current = setInterval(nextSlide, autoPlayInterval);
@@ -65,7 +62,6 @@ const useCarousel = (
     };
   }, [isAutoPlaying, itemCount, nextSlide, autoPlayInterval]);
 
-  // 🔑 Pause on user interaction
   const pauseAutoPlay = useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -91,7 +87,6 @@ const useCarousel = (
   };
 };
 
-// 🎯 Memoized Components
 const StoryImage = ({
   story,
   isLoading,
@@ -101,20 +96,23 @@ const StoryImage = ({
   isLoading: boolean;
   onLoadComplete: () => void;
 }) => (
-  <div className="relative w-full max-w-[400px] mx-auto lg:max-w-[500px] group">
-    <div className="relative overflow-hidden rounded-lg shadow-2xl">
+  <div className="relative w-full max-w-[260px] mx-auto lg:max-w-[320px] group">
+    <div className="relative aspect-[3/4] overflow-hidden rounded-lg shadow-xl">
       <Image
         src={story.thumb_url}
         alt={story.name}
         fill
-        className={`object-cover transition-all duration-700 ${
+        className={`object-cover transition-all duration-500 ${
           isLoading ? "blur-sm scale-105" : "blur-0 scale-100"
         } group-hover:scale-105`}
-        sizes="(max-width: 1024px) 400px, 500px"
+        sizes="(max-width: 1024px) 260px, 320px"
         priority
         onLoad={onLoadComplete}
+        onError={() => {
+          console.warn(`Failed to load image: ${story.thumb_url}`);
+          onLoadComplete();
+        }}
       />
-      {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
     </div>
   </div>
@@ -125,12 +123,12 @@ const CategoryBadges = ({
 }: {
   categories: StoryObject["category"];
 }) => (
-  <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
+  <div className="flex flex-wrap gap-1.5 justify-center lg:justify-start">
     {categories.slice(0, 3).map((cat) => (
       <Link
         key={cat._id}
         href={`/category/${cat.slug}`}
-        className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium 
+        className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium 
                    bg-primary/90 text-primary-foreground hover:bg-primary 
                    transition-colors duration-200 backdrop-blur-sm"
       >
@@ -141,22 +139,22 @@ const CategoryBadges = ({
 );
 
 const StoryStats = ({ story }: { story: StoryObject }) => (
-  <div className="mt-4 flex flex-wrap items-center gap-4 justify-center lg:justify-start">
-    <div className="flex items-center gap-1 bg-black/20 backdrop-blur-sm rounded-full px-3 py-1">
-      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-      <span className="text-sm font-medium text-white">
+  <div className="mt-3 flex flex-wrap items-center gap-3 justify-center lg:justify-start">
+    <div className="flex items-center gap-1 bg-black/20 backdrop-blur-sm rounded-full px-2.5 py-0.5">
+      <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
+      <span className="text-xs font-medium text-white">
         {story.ratingValue.toFixed(1)} ({story.ratingCount.toLocaleString()})
       </span>
     </div>
-    <div className="flex items-center gap-1 bg-black/20 backdrop-blur-sm rounded-full px-3 py-1">
-      <BookOpen className="h-4 w-4 text-white" />
-      <span className="text-sm font-medium text-white">
+    <div className="flex items-center gap-1 bg-black/20 backdrop-blur-sm rounded-full px-2.5 py-0.5">
+      <BookOpen className="h-3.5 w-3.5 text-white" />
+      <span className="text-xs font-medium text-white">
         {story.views} lượt đọc
       </span>
     </div>
     <Badge
       variant={story.status === "completed" ? "default" : "secondary"}
-      className="backdrop-blur-sm"
+      className="backdrop-blur-sm text-xs px-2 py-0.5"
     >
       {story.status === "completed" ? "Hoàn thành" : "Đang phát hành"}
     </Badge>
@@ -176,28 +174,27 @@ const CarouselControls = ({
   onSlideChange: (index: number) => void;
   onToggleAutoPlay: () => void;
 }) => (
-  <div className="mt-8 flex items-center justify-center gap-4">
-    {/* Auto-play control */}
+  <div className="mt-6 flex items-center justify-center gap-3">
     <button
       onClick={onToggleAutoPlay}
-      className="p-2 rounded-full bg-black/20 backdrop-blur-sm text-white hover:bg-black/40 transition-colors"
+      className="p-1.5 rounded-full bg-black/20 backdrop-blur-sm text-white hover:bg-black/40 transition-colors"
       aria-label={
         isAutoPlaying ? "Tạm dừng tự động chuyển" : "Tiếp tục tự động chuyển"
       }
     >
       {isAutoPlaying ? (
-        <Pause className="h-4 w-4" />
+        <Pause className="h-3.5 w-3.5" />
       ) : (
-        <Play className="h-4 w-4" />
+        <Play className="h-3.5 w-3.5" />
       )}
     </button>
 
     {/* Slide indicators */}
-    <div className="flex gap-2">
+    <div className="flex gap-1.5">
       {stories.map((story, index) => (
         <button
           key={story._id}
-          className={`h-2 w-8 rounded-full transition-all duration-300 ${
+          className={`h-1.5 w-6 rounded-full transition-all duration-300 ${
             index === currentIndex
               ? "bg-primary shadow-lg"
               : "bg-white/50 hover:bg-white/80"
@@ -217,13 +214,11 @@ interface HeroSectionProps {
 export function HeroSection({ stories }: HeroSectionProps) {
   const [imageLoading, setImageLoading] = useState<Record<string, boolean>>({});
 
-  // 🔑 Memoized featured stories
   const featuredStories = useMemo(
     () => stories.slice(0, CAROUSEL_CONFIG.FEATURED_STORIES_LIMIT),
     [stories]
   );
 
-  // 🔑 Carousel logic
   const {
     currentIndex,
     isAutoPlaying,
@@ -233,18 +228,15 @@ export function HeroSection({ stories }: HeroSectionProps) {
     resumeAutoPlay,
   } = useCarousel(featuredStories.length);
 
-  // 🔑 Current story
   const currentStory = useMemo(
     () => featuredStories[currentIndex],
     [featuredStories, currentIndex]
   );
 
-  // 🔑 Image loading handler
   const handleImageLoad = useCallback((storyId: string) => {
     setImageLoading((prev) => ({ ...prev, [storyId]: false }));
   }, []);
 
-  // 🔑 Initialize image loading states
   useEffect(() => {
     const initialLoadingState = featuredStories.reduce((acc, story) => {
       acc[story._id] = true;
@@ -254,7 +246,6 @@ export function HeroSection({ stories }: HeroSectionProps) {
     setImageLoading(initialLoadingState);
   }, [featuredStories]);
 
-  // 🔑 Early return for empty stories
   if (!stories.length || !currentStory) {
     return null;
   }
@@ -265,10 +256,9 @@ export function HeroSection({ stories }: HeroSectionProps) {
       onMouseEnter={pauseAutoPlay}
       onMouseLeave={resumeAutoPlay}
     >
-      {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5" />
 
-      <div className="container relative py-16 lg:py-24">
+      <div className="container relative py-10 lg:py-16">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStory._id}
@@ -280,9 +270,8 @@ export function HeroSection({ stories }: HeroSectionProps) {
               duration: CAROUSEL_CONFIG.ANIMATION_DURATION,
               ease: "easeInOut",
             }}
-            className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
+            className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center"
           >
-            {/* Image Section */}
             <StoryImage
               story={currentStory}
               isLoading={imageLoading[currentStory._id] ?? true}
@@ -290,10 +279,10 @@ export function HeroSection({ stories }: HeroSectionProps) {
             />
 
             {/* Content Section */}
-            <div className="flex flex-col justify-center text-center lg:text-left space-y-6">
+            <div className="flex flex-col justify-center text-center lg:text-left space-y-4">
               <CategoryBadges categories={currentStory.category} />
 
-              <h1 className="text-4xl font-bold text-white md:text-5xl lg:text-6xl leading-tight">
+              <h1 className="text-3xl font-bold text-white md:text-4xl lg:text-5xl leading-tight">
                 <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                   {currentStory.name}
                 </span>
@@ -301,26 +290,25 @@ export function HeroSection({ stories }: HeroSectionProps) {
 
               <StoryStats story={currentStory} />
 
-              {/* Action Buttons */}
-              <div className="flex gap-4 justify-center lg:justify-start pt-4">
+              <div className="flex gap-3 justify-center lg:justify-start pt-3">
                 <Button
                   asChild
-                  size="lg"
+                  size="default"
                   className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all"
                 >
                   <Link href={`/comic/${currentStory.slug}`} className="gap-2">
                     Xem chi tiết
-                    <ChevronRight className="h-5 w-5" />
+                    <ChevronRight className="h-4 w-4" />
                   </Link>
                 </Button>
                 <Button
                   asChild
                   variant="outline"
-                  size="lg"
+                  size="default"
                   className="gap-2 bg-transparent text-white border-white/30 hover:bg-white/10 hover:border-white/50 transition-all"
                 >
                   <Link href={`/read/${currentStory.slug}/1`}>
-                    <BookOpen className="h-5 w-5" />
+                    <BookOpen className="h-4 w-4" />
                     Đọc ngay
                   </Link>
                 </Button>
