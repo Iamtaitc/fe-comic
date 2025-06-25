@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseURL = 'https://bfc0-115-76-54-60.ngrok-free.app/api/v1';
+const baseURL = 'https://0f6e-115-76-54-60.ngrok-free.app/api/v1';
 
 export const apiClient = axios.create({
   baseURL,
@@ -40,15 +40,6 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
-<<<<<<< HEAD
-    const errorDetails = {
-      url: error.config?.url,
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message,
-    };
-    console.error('API Error:', errorDetails);
-=======
     // Xử lý lỗi
     if (error.response) {
       // Lỗi từ server
@@ -60,7 +51,6 @@ apiClient.interceptors.response.use(
       // Lỗi khác
       console.error('Request error:', error.message);
     }
->>>>>>> 2b48f94 (Fix API error logging to correctly output error response data)
     return Promise.reject(error);
   }
 );
