@@ -106,7 +106,7 @@ export const fetchStoryDetail = createAsyncThunk(
         throw new Error(response.message || "Lấy thông tin chi tiết truyện thất bại");
       }
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Fetch Story Detail Error:", {
         message: error.message,
         response: error.response?.data,
