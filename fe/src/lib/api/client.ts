@@ -40,6 +40,7 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
+<<<<<<< HEAD
     const errorDetails = {
       url: error.config?.url,
       status: error.response?.status,
@@ -47,6 +48,19 @@ apiClient.interceptors.response.use(
       message: error.message,
     };
     console.error('API Error:', errorDetails);
+=======
+    // Xử lý lỗi
+    if (error.response) {
+      // Lỗi từ server
+      console.error('API Error:', error.response.data);
+    } else if (error.request) {
+      // Không nhận được response
+      console.error('No response received:', error.request);
+    } else {
+      // Lỗi khác
+      console.error('Request error:', error.message);
+    }
+>>>>>>> 2b48f94 (Fix API error logging to correctly output error response data)
     return Promise.reject(error);
   }
 );
