@@ -29,13 +29,21 @@ export default function Home() {
   const { popularStories, categories, loading, error } = useAppSelector(
     (state) => state.home
   );
+  const { isAuthenticated, user, token, isLoading: authLoading } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
+    const renderTime = new Date().toISOString();
+    console.log("Home Page: Auth state on render:", {
+      renderTime,
+      isAuthenticated,
+      user,
+      token,
+      localStorageToken: localStorage.getItem("token"),
+      authLoading,
+    });
     dispatch(fetchHomeData());
     dispatch(fetchTopWeeklyStories());
   }, [dispatch]);
-
-  console.log("Redux State:", { popularStories, categories, loading, error });
 
   const fetchPopularStories = useCallback(async (params) => {
     const response = await getPopularStories(params || {});
@@ -44,7 +52,7 @@ export default function Home() {
       success: response.data.success,
       data: {
         data: {
-          stories: response.data.data.data.stories || [], // Sửa lại để lấy response.data.data.data.stories
+          stories: response.data.data.data.stories || [],
         },
       },
     };
@@ -57,7 +65,7 @@ export default function Home() {
       success: response.data.success,
       data: {
         data: {
-          stories: response.data.data.data.stories || [], // Sửa lại để lấy response.data.data.data.stories
+          stories: response.data.data.data.stories || [],
         },
       },
     };
@@ -70,7 +78,7 @@ export default function Home() {
       success: response.data.success,
       data: {
         data: {
-          stories: response.data.data.data.stories || [], // Sửa lại để lấy response.data.data.data.stories
+          stories: response.data.data.data.stories || [],
         },
       },
     };
@@ -83,15 +91,25 @@ export default function Home() {
       success: response.data.success,
       data: {
         data: {
-          stories: response.data.data.data.stories || [], // Sửa lại để lấy response.data.data.data.stories
+          stories: response.data.data.data.stories || [],
         },
       },
     };
   }, []);
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div>
+        {/* Header Skeleton */}
+        <div className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md shadow-sm">
+          <div className="container flex h-16 items-center justify-between py-4">
+            <Skeleton className="h-8 w-32" />
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-8 w-64" />
+              <Skeleton className="h-8 w-8 rounded-full" />
+            </div>
+          </div>
+        </div>
         {/* Hero Skeleton */}
         <div className="relative h-[500px] w-full bg-muted">
           <div className="container relative h-full">
@@ -116,7 +134,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-
         {/* Featured Categories Skeleton */}
         <section className="py-16">
           <div className="container">
@@ -140,7 +157,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-
         {/* Stories Skeleton */}
         {["popular", "ongoing", "completed", "upcoming"].map((section) => (
           <section key={section} className="py-12">
@@ -195,10 +211,8 @@ export default function Home() {
       {popularStories && popularStories.length > 0 && (
         <HeroSection stories={popularStories} />
       )}
-
       {/* Featured Categories Section */}
       <FeaturedCategories />
-
       {/* Stories Sections */}
       <StoriesSection
         fetchStories={fetchPopularStories}

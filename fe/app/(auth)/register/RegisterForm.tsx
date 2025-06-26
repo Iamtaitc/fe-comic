@@ -7,11 +7,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -21,6 +21,8 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { registerUser } from "@/store/slices/authSlice";
+import type { AppDispatch } from "@/store/store";
 
 // Schema xác thực dữ liệu form
 const formSchema = z
@@ -42,10 +44,11 @@ type FormValues = z.infer<typeof formSchema>;
 
 export function RegisterForm() {
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -56,28 +59,22 @@ export function RegisterForm() {
       acceptTerms: false,
     },
   });
-  
+
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
-    
+
     try {
-      // Giả lập API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      
-      // Giả lập đăng ký thành công
-      console.log("Register data:", data);
+      await dispatch(registerUser({ username: data.username, email: data.email, password: data.password })).unwrap();
       toast.success("Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.");
-      
-      // Chuyển hướng đến trang đăng nhập sau khi đăng ký
       router.push("/login");
-    } catch (error) {
-      toast.error("Đăng ký thất bại. Vui lòng thử lại sau.");
+    } catch (error: any) {
+      toast.error(error.message || "Đăng ký thất bại. Vui lòng thử lại sau.");
       console.error("Register error:", error);
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   return (
     <div className="mx-auto max-w-md space-y-6 p-6 bg-card rounded-lg shadow-sm border">
       <div className="text-center space-y-2">
@@ -86,7 +83,7 @@ export function RegisterForm() {
           Tạo tài khoản để trải nghiệm đầy đủ các tính năng của MangaSphere
         </p>
       </div>
-      
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
@@ -106,7 +103,7 @@ export function RegisterForm() {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="email"
@@ -124,7 +121,7 @@ export function RegisterForm() {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="password"
@@ -162,7 +159,7 @@ export function RegisterForm() {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="confirmPassword"
@@ -200,7 +197,7 @@ export function RegisterForm() {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="acceptTerms"
@@ -235,7 +232,7 @@ export function RegisterForm() {
               </FormItem>
             )}
           />
-          
+
           <Button type="submit" variant="manga" className="w-full" disabled={isLoading}>
             {isLoading ? (
               <>
@@ -248,7 +245,7 @@ export function RegisterForm() {
           </Button>
         </form>
       </Form>
-      
+
       <div className="text-center text-sm">
         <p className="text-muted-foreground">
           Đã có tài khoản?{" "}

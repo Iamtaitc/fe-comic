@@ -7,11 +7,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -21,10 +21,12 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { loginUser } from "@/store/slices/authSlice";
+import type { AppDispatch } from "@/store/store";
 
 // Schema xác thực dữ liệu form
 const formSchema = z.object({
-  email: z.string().email({ message: "Email không hợp lệ" }),
+  username: z.string().min(3, { message: "Tên người dùng phải có ít nhất 3 ký tự" }),
   password: z.string().min(6, { message: "Mật khẩu phải có ít nhất 6 ký tự" }),
   rememberMe: z.boolean().default(false),
 });
@@ -33,41 +35,36 @@ type FormValues = z.infer<typeof formSchema>;
 
 export function LoginForm() {
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  
+
   // Khởi tạo form với React Hook Form + Zod
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
       rememberMe: false,
     },
   });
-  
+
   // Xử lý đăng nhập
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
-    
+
     try {
-      // Giả lập API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      
-      // Giả lập đăng nhập thành công
-      console.log("Login data:", data);
+      await dispatch(loginUser({ username: data.username, password: data.password })).unwrap();
       toast.success("Đăng nhập thành công!");
-      
-      // Chuyển hướng đến trang chủ sau khi đăng nhập
       router.push("/");
-    } catch (error) {
-      toast.error("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
+    } catch (error: any) {
+      toast.error(error.message || "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
       console.error("Login error:", error);
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   return (
     <div className="mx-auto max-w-md space-y-6 p-6 bg-card rounded-lg shadow-sm border">
       <div className="text-center space-y-2">
@@ -76,18 +73,18 @@ export function LoginForm() {
           Đăng nhập để tiếp tục đọc truyện và sử dụng các tính năng đầy đủ
         </p>
       </div>
-      
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
             control={form.control}
-            name="email"
+            name="username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>Tên người dùng</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="your.email@example.com"
+                    placeholder="mangareader123"
                     {...field}
                     disabled={isLoading}
                   />
@@ -96,7 +93,7 @@ export function LoginForm() {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="password"
@@ -134,7 +131,7 @@ export function LoginForm() {
               </FormItem>
             )}
           />
-          
+
           <div className="flex items-center justify-between">
             <FormField
               control={form.control}
@@ -154,7 +151,7 @@ export function LoginForm() {
                 </FormItem>
               )}
             />
-            
+
             <Link
               href="/forgot-password"
               className="text-sm font-medium text-primary hover:underline"
@@ -162,7 +159,7 @@ export function LoginForm() {
               Quên mật khẩu?
             </Link>
           </div>
-          
+
           <Button type="submit" variant="manga" className="w-full" disabled={isLoading}>
             {isLoading ? (
               <>
@@ -175,7 +172,7 @@ export function LoginForm() {
           </Button>
         </form>
       </Form>
-      
+
       <div className="text-center text-sm">
         <p className="text-muted-foreground">
           Chưa có tài khoản?{" "}
@@ -187,7 +184,7 @@ export function LoginForm() {
           </Link>
         </p>
       </div>
-      
+
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
@@ -198,7 +195,7 @@ export function LoginForm() {
           </span>
         </div>
       </div>
-      
+
       <div className="grid grid-cols-2 gap-4">
         <Button variant="outline" className="w-full">Google</Button>
         <Button variant="outline" className="w-full">Facebook</Button>

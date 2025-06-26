@@ -40,7 +40,7 @@ const nextConfig: NextConfig = {
       fallback: [
         {
           source: '/api/v1/:path*',
-          destination: `https://bfc0-115-76-54-60.ngrok-free.app/api/v1/:path*`,
+          destination: `https://04df-2402-800-620e-a4b0-f829-eca7-60c6-1c6f.ngrok-free.app/api/v1/:path*`,
         },
       ],
     };
