@@ -1,7 +1,8 @@
 // src/app/(auth)/profile/page.tsx
+"use client";
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
-import { options } from '@/app/api/auth/[...nextauth]/options';
+import { options } from '@/app/api/auth/[...next-auth]/options';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import ReadingHistory from '@/components/profile/ReadingHistory';
 import Bookmarks from '@/components/profile/Bookmarks';

@@ -1,40 +1,41 @@
-// app/layout.tsx
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import { ThemeProvider } from "../src/components/theme-provider";
-import { ReduxProvider } from "../src/store/provider";
-import { Header } from "../src/components/common/Header";
-import Footer from "../src/components/common/Footer";
-import { TooltipProvider } from "../src/components/ui/tooltip";
-import "./globals.css";
+import type React from "react"
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
+import { ReduxProvider } from "../src/store/provider"
+import { Header } from "../src/components/common/Header"
+import Footer from "../src/components/common/Footer"
+import { TooltipProvider } from "../src/components/ui/tooltip"
+import { AuthModals } from "../src/components/auth/AuthModals"
+import "./globals.css"
+import { AuthInitializer } from "@/components/auth/AuthInitializer"
 
-const inter = Inter({ subsets: ["latin"] });
+
+const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "SubTruyện - Đọc truyện tranh online",
-  description:
-    "Đọc truyện tranh online miễn phí với kho truyện đồ sộ và cập nhật liên tục",
-};
+  description: "Đọc truyện tranh online miễn phí với kho truyện đồ sộ và cập nhật liên tục",
+}
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
     <html lang="vi" suppressHydrationWarning>
       <body className={inter.className}>
         <ReduxProvider>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <TooltipProvider>
+              <AuthInitializer />
               <Header />
               <main>{children}</main>
               <Footer />
+              <AuthModals />
+              <AuthModals />
             </TooltipProvider>
-          </ThemeProvider>
         </ReduxProvider>
       </body>
     </html>
-  );
+  )
 }
-

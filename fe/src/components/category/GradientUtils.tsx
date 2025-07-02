@@ -54,6 +54,10 @@ export const getGradientBySlug = (slug: string) => {
     "live-action": "from-gray-600 via-blue-600 to-teal-600",
     "cooking": "from-yellow-600 via-orange-600 to-red-600",
     "tap-chi-truyen-tranh": "from-blue-600 via-indigo-600 to-purple-600",
+    "popular": "from-red-500 via-orange-500 to-yellow-500",
+    "upcoming": "from-purple-500 via-pink-500 to-rose-500",
+    "ongoing": "from-blue-500 via-cyan-500 to-teal-500",
+    "completed": "from-green-500 via-emerald-500 to-teal-500",
     default: "from-primary via-primary/80 to-primary/60"
   };
   return gradients[slug] || gradients.default;

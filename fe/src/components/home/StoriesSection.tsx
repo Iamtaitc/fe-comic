@@ -13,7 +13,6 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { RootState } from "@/store/store";
 
-/* ----------------- Dynamic import ----------------- */
 const StoryCard = dynamic(
   () => import("./StoryCard").then((mod) => ({ default: mod.StoryCard })),
   {
@@ -30,7 +29,6 @@ const StoryCard = dynamic(
   }
 );
 
-/* ----------------- Animation variants ----------------- */
 const easeOut: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
 const animations = {
@@ -67,7 +65,6 @@ const animations = {
   },
 };
 
-/* ----------------- Memo components ----------------- */
 const LoadingSkeleton = memo(({ count = 6 }: { count?: number }) => (
   <motion.div
     className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
@@ -136,8 +133,6 @@ const EmptyState = memo(({ title }: { title: string }) => (
 ));
 EmptyState.displayName = "EmptyState";
 
-/* ----------------- Types ----------------- */
-// 🔑 Correct type for async thunk actions
 type AsyncThunkAction = AsyncThunk<
   { stories: StoryObject[]; cached: boolean },
   { page?: number; limit?: number; force?: boolean },
@@ -153,11 +148,9 @@ interface StoriesSectionProps {
   titleGradient: string;
   iconMotion: string;
   limit?: number;
-  // 🔑 Type-safe async thunk
   fetchAction: AsyncThunkAction;
 }
 
-/* ----------------- Main component ----------------- */
 export function StoriesSection({
   sectionKey,
   title,
@@ -180,20 +173,17 @@ export function StoriesSection({
     [stories, limit]
   );
 
-  /* ----- Smart fetch with cache ----- */
   const handleFetch = useCallback(
     (force = false) => {
       const now = Date.now();
-      const CACHE_TIME = 5 * 60 * 1000; // 5 minutes
-      
-      // Skip if recently fetched and not forced
+      const CACHE_TIME = 5 * 60 * 1000;
+
       if (!force && lastFetched && now - lastFetched < CACHE_TIME) {
         console.log(`[${sectionKey}] Cache hit, skipping fetch`);
         return;
       }
 
       console.log(`[${sectionKey}] Fetching data...`);
-      // 🔑 Dispatch async thunk with correct params
       dispatch(fetchAction({ limit, force }));
     },
     [dispatch, fetchAction, lastFetched, limit, sectionKey]
@@ -207,42 +197,44 @@ export function StoriesSection({
   const handleRetry = useCallback(() => handleFetch(true), [handleFetch]);
 
   /* ----- Render helpers ----- */
-  const renderStoriesGrid = useCallback(() => (
-    <motion.div
-      className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
-      variants={animations.container}
-      initial="hidden"
-      animate="show"
-    >
-      {displayStories.map((story: StoryObject, i) => (
-        <motion.div
-          key={story._id}
-          variants={animations.card}
-          className="story-card"
-        >
-          <StoryCard story={story} priority={i < 4} />
-        </motion.div>
-      ))}
-    </motion.div>
-  ), [displayStories]);
+  const renderStoriesGrid = useCallback(
+    () => (
+      <motion.div
+        className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+        variants={animations.container}
+        initial="hidden"
+        animate="show"
+      >
+        {displayStories.map((story: StoryObject, i) => (
+          <motion.div
+            key={story._id}
+            variants={animations.card}
+            className="story-card"
+          >
+            <StoryCard story={story} priority={i < 4} />
+          </motion.div>
+        ))}
+      </motion.div>
+    ),
+    [displayStories]
+  );
 
   const renderContent = () => {
     if (loading && displayStories.length === 0) {
       return <LoadingSkeleton count={Math.min(limit, 10)} />;
     }
-    
+
     if (error) {
       return <ErrorAlert error={error} onRetry={handleRetry} />;
     }
-    
+
     if (displayStories.length === 0) {
       return <EmptyState title={title} />;
     }
-    
+
     return renderStoriesGrid();
   };
 
-  /* ----- JSX ----- */
   return (
     <section className="py-8 md:py-12">
       <div className="container px-4">
