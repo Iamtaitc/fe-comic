@@ -1,137 +1,17 @@
-// components/StoriesSection.tsx
+// components/home/StoriesSection.tsx - Updated for existing StoryCard
 "use client";
 
 import { useEffect, memo, useCallback, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { StoryObject } from "@/lib/api/comic/types";
 import { AsyncThunk } from "@reduxjs/toolkit";
-import { motion, AnimatePresence } from "framer-motion";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import dynamic from "next/dynamic";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { StoriesGrid } from "@/components/common/StoriesGrid";
+import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
+import { StoryObject, CACHE_TIME } from "@/lib/api/comic/types";
 import { RootState } from "@/store/store";
-
-const StoryCard = dynamic(
-  () => import("./StoryCard").then((mod) => ({ default: mod.StoryCard })),
-  {
-    loading: () => (
-      <div className="manga-card animate-pulse">
-        <div className="manga-cover aspect-[3/4] rounded-lg bg-gray-200" />
-        <div className="space-y-2 p-2">
-          <div className="h-4 rounded bg-gray-200" />
-          <div className="h-3 w-16 rounded bg-gray-200" />
-        </div>
-      </div>
-    ),
-    ssr: false,
-  }
-);
-
-const easeOut: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
-
-const animations = {
-  container: {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { duration: 0.2, staggerChildren: 0.05, delayChildren: 0.1 },
-    },
-  },
-  title: {
-    hidden: { opacity: 0, y: 8 },
-    show: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.3, ease: easeOut },
-    },
-  },
-  card: {
-    hidden: { opacity: 0, y: 12 },
-    show: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.25, ease: easeOut },
-    },
-  },
-  button: {
-    hidden: { opacity: 0, scale: 0.95 },
-    show: {
-      opacity: 1,
-      scale: 1,
-      transition: { duration: 0.25, ease: easeOut, delay: 0.15 },
-    },
-  },
-};
-
-const LoadingSkeleton = memo(({ count = 6 }: { count?: number }) => (
-  <motion.div
-    className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
-    variants={animations.container}
-    initial="hidden"
-    animate="show"
-  >
-    {Array.from({ length: count }, (_, i) => (
-      <motion.div
-        key={`skeleton-${i}`}
-        variants={animations.card}
-        className="manga-card"
-      >
-        <Skeleton className="manga-cover aspect-[3/4] rounded-lg" />
-        <div className="space-y-2 p-2">
-          <Skeleton className="h-4 w-full rounded" />
-          <Skeleton className="h-3 w-16 rounded" />
-          <div className="flex gap-1">
-            <Skeleton className="h-3 w-10 rounded" />
-            <Skeleton className="h-3 w-10 rounded" />
-          </div>
-        </div>
-      </motion.div>
-    ))}
-  </motion.div>
-));
-LoadingSkeleton.displayName = "LoadingSkeleton";
-
-const ErrorAlert = memo(
-  ({ error, onRetry }: { error: string; onRetry?: () => void }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
-    >
-      <Alert variant="destructive" className="bg-red-50 border-red-200">
-        <AlertDescription className="text-sm">
-          {error}
-          {onRetry && (
-            <button
-              onClick={onRetry}
-              className="ml-2 font-medium underline hover:no-underline"
-            >
-              Thử lại
-            </button>
-          )}
-        </AlertDescription>
-      </Alert>
-    </motion.div>
-  )
-);
-ErrorAlert.displayName = "ErrorAlert";
-
-const EmptyState = memo(({ title }: { title: string }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 8 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.2 }}
-  >
-    <Alert className="bg-gray-50 border-gray-200">
-      <AlertDescription className="text-sm text-gray-600">
-        Không có {title.toLowerCase()} nào hiện tại.
-      </AlertDescription>
-    </Alert>
-  </motion.div>
-));
-EmptyState.displayName = "EmptyState";
+import Link from "next/link";
 
 type AsyncThunkAction = AsyncThunk<
   { stories: StoryObject[]; cached: boolean },
@@ -149,9 +29,41 @@ interface StoriesSectionProps {
   iconMotion: string;
   limit?: number;
   fetchAction: AsyncThunkAction;
+  columns?: {
+    mobile: number;
+    tablet: number;
+    desktop: number;
+    large: number;
+  };
 }
 
-export function StoriesSection({
+const defaultColumns = {
+  mobile: 2,
+  tablet: 3,
+  desktop: 4,
+  large: 5
+};
+
+const animations = {
+  title: {
+    hidden: { opacity: 0, y: 8 },
+    show: { 
+      opacity: 1, 
+      y: 0, 
+      transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1] } 
+    },
+  },
+  button: {
+    hidden: { opacity: 0, scale: 0.95 },
+    show: { 
+      opacity: 1, 
+      scale: 1, 
+      transition: { duration: 0.25, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] } 
+    },
+  },
+};
+
+export const StoriesSection = memo(function StoriesSection({
   sectionKey,
   title,
   icon,
@@ -161,9 +73,9 @@ export function StoriesSection({
   iconMotion,
   limit = 10,
   fetchAction,
+  columns = defaultColumns
 }: StoriesSectionProps) {
   const dispatch = useAppDispatch();
-
   const { stories, loading, error, lastFetched } = useAppSelector(
     (state) => state.home.sections[sectionKey]
   );
@@ -176,65 +88,99 @@ export function StoriesSection({
   const handleFetch = useCallback(
     (force = false) => {
       const now = Date.now();
-      const CACHE_TIME = 5 * 60 * 1000;
-
       if (!force && lastFetched && now - lastFetched < CACHE_TIME) {
-        console.log(`[${sectionKey}] Cache hit, skipping fetch`);
         return;
       }
-
-      console.log(`[${sectionKey}] Fetching data...`);
       dispatch(fetchAction({ limit, force }));
     },
-    [dispatch, fetchAction, lastFetched, limit, sectionKey]
+    [dispatch, fetchAction, lastFetched, limit]
   );
 
-  // Auto-fetch on mount
   useEffect(() => {
     handleFetch();
   }, [handleFetch]);
 
   const handleRetry = useCallback(() => handleFetch(true), [handleFetch]);
 
-  /* ----- Render helpers ----- */
-  const renderStoriesGrid = useCallback(
-    () => (
-      <motion.div
-        className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
-        variants={animations.container}
-        initial="hidden"
-        animate="show"
-      >
-        {displayStories.map((story: StoryObject, i) => (
-          <motion.div
-            key={story._id}
-            variants={animations.card}
-            className="story-card"
+  // 🔑 Loading state
+  if (loading && displayStories.length === 0) {
+    return (
+      <section className="py-8 md:py-12">
+        <div className="container px-4">
+          <div className="mb-6 md:mb-8">
+            <motion.h2
+              className={`flex items-center gap-2 text-lg font-bold md:text-2xl ${titleGradient} bg-clip-text text-transparent`}
+              variants={animations.title}
+              initial="hidden"
+              animate="show"
+            >
+              <span className={`${iconClass} text-base md:text-xl`}>{icon}</span>
+              {title}
+            </motion.h2>
+          </div>
+          <LoadingSkeleton count={Math.min(limit, 10)} columns={columns} />
+        </div>
+      </section>
+    );
+  }
+
+  // 🔑 Error state
+  if (error) {
+    return (
+      <section className="py-8 md:py-12">
+        <div className="container px-4">
+          <motion.h2
+            className={`flex items-center gap-2 text-lg font-bold md:text-2xl ${titleGradient} bg-clip-text text-transparent mb-6`}
+            variants={animations.title}
+            initial="hidden"
+            animate="show"
           >
-            <StoryCard story={story} priority={i < 4} />
-          </motion.div>
-        ))}
-      </motion.div>
-    ),
-    [displayStories]
-  );
+            <span className={`${iconClass} text-base md:text-xl`}>{icon}</span>
+            {title}
+          </motion.h2>
+          
+          <Alert variant="destructive" className="bg-red-50 border-red-200">
+            <AlertDescription className="text-sm">
+              {error}
+              <button
+                onClick={handleRetry}
+                className="ml-2 font-medium underline hover:no-underline transition-colors"
+              >
+                Thử lại
+              </button>
+            </AlertDescription>
+          </Alert>
+        </div>
+      </section>
+    );
+  }
 
-  const renderContent = () => {
-    if (loading && displayStories.length === 0) {
-      return <LoadingSkeleton count={Math.min(limit, 10)} />;
-    }
+  // 🔑 Empty state
+  if (displayStories.length === 0) {
+    return (
+      <section className="py-8 md:py-12">
+        <div className="container px-4">
+          <motion.h2
+            className={`flex items-center gap-2 text-lg font-bold md:text-2xl ${titleGradient} bg-clip-text text-transparent mb-6`}
+            variants={animations.title}
+            initial="hidden"
+            animate="show"
+          >
+            <span className={`${iconClass} text-base md:text-xl`}>{icon}</span>
+            {title}
+          </motion.h2>
+          
+          <Alert className="bg-gray-50 border-gray-200">
+            <AlertDescription className="text-sm text-gray-600">
+              Không có {title.toLowerCase()} nào hiện tại.
+            </AlertDescription>
+          </Alert>
+        </div>
+      </section>
+    );
+  }
 
-    if (error) {
-      return <ErrorAlert error={error} onRetry={handleRetry} />;
-    }
-
-    if (displayStories.length === 0) {
-      return <EmptyState title={title} />;
-    }
-
-    return renderStoriesGrid();
-  };
-
+  // 🔑 Success state
   return (
     <section className="py-8 md:py-12">
       <div className="container px-4">
@@ -259,7 +205,7 @@ export function StoriesSection({
               asChild
               variant="outline"
               size="sm"
-              className="border-none px-4 py-2 text-sm hover:text-red-200 md:px-6"
+              className="border-none px-4 py-2 text-sm hover:text-red-200 md:px-6 transition-colors"
             >
               <Link href={link}>
                 Xem tất cả
@@ -269,7 +215,7 @@ export function StoriesSection({
                   transition={{
                     repeat: Infinity,
                     duration: 1.5,
-                    ease: easeOut,
+                    ease: [0.25, 0.1, 0.25, 1],
                   }}
                 >
                   →
@@ -279,11 +225,16 @@ export function StoriesSection({
           </motion.div>
         </div>
 
-        {/* Content */}
+        {/* Stories Grid */}
         <div className="relative">
-          <AnimatePresence mode="wait">{renderContent()}</AnimatePresence>
+          <StoriesGrid 
+            stories={displayStories} 
+            columns={columns}
+            animate={true}
+            showPriority={true}
+          />
 
-          {/* Overlay loading indicator */}
+          {/* Loading overlay for refresh */}
           {loading && displayStories.length > 0 && (
             <motion.div
               className="absolute inset-0 flex items-center justify-center rounded-lg bg-white/50 backdrop-blur-sm"
@@ -291,11 +242,16 @@ export function StoriesSection({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <div className="h-6 w-6 animate-spin rounded-full border-2 border-red-500 border-t-transparent" />
+              <div className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 shadow-lg">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                <span className="text-sm text-muted-foreground">Đang cập nhật...</span>
+              </div>
             </motion.div>
           )}
         </div>
       </div>
     </section>
   );
-}
+});
+
+StoriesSection.displayName = "StoriesSection";
