@@ -8,9 +8,9 @@ import {
   resetCategoryState,
   setCurrentCategory,
 } from "@/store/slices/categorySlice";
-import { CategoryHeader } from "@/components/category/CategoryHeader";
-import CategoryFilters from "@/components/category/CategoryFilters";
-import { CategoryStoryList } from "@/components/category/CategoryStoryList";
+import { CategoryHeader } from "@/components/detail/DetailHeader";
+import CategoryFilters from "@/components/detail/DetailFilters";
+import { CategoryStoryList } from "@/components/detail/DetailStoryList";
 import { getCategory } from "@/lib/api/comic/category";
 
 interface CategoryPageProps {

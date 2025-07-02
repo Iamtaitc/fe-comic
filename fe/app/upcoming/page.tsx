@@ -4,9 +4,9 @@
 import { useEffect, useState } from "react"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { fetchStoriesByCategory, resetCategoryState, setCurrentCategory } from "@/store/slices/categorySlice"
-import { CategoryHeader } from "@/components/category/CategoryHeader"
-import CategoryFilters from "@/components/category/CategoryFilters"
-import { CategoryStoryList } from "@/components/category/CategoryStoryList"
+import { CategoryHeader } from "@/components/detail/DetailHeader"
+import CategoryFilters from "@/components/detail/DetailFilters"
+import { CategoryStoryList } from "@/components/detail/DetailStoryList"
 import { Calendar } from "lucide-react"
 
 export default function UpcomingPage() {

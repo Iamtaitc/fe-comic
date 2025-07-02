@@ -8,7 +8,7 @@ import { AlertCircle, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
 import { getCategory } from "@/lib/api/comic/category"; 
 import { CategoryObject } from "@/lib/api/comic/types";
-import { getGradientBySlug } from "@/components/category/GradientUtils";
+import { getGradientBySlug } from "@/components/detail/GradientUtils";
 
 export default function CategoryPage() {
   const [categories, setCategories] = useState<CategoryObject[]>([]);

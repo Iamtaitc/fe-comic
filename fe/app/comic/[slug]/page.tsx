@@ -1,4 +1,4 @@
-import StoryPage from "./StoryPage";
+import StoryPage from "./components/StoryPage";
 
 interface PageProps {
   params: { slug: string };

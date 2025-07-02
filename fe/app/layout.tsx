@@ -16,7 +16,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "SubTruyện - Đọc truyện tranh online",
   description: "Đọc truyện tranh online miễn phí với kho truyện đồ sộ và cập nhật liên tục",
-  keywords: "truyện tranh, manga, manhwa, manhua, đọc truyện online, SubTruyện",
+  keywords: "truyện tranh, manga, anime, chuyển sinh, đọc truyện online, SubTruyện",
   authors: [{ name: "SubTruyện Team" }],
   viewport: "width=device-width, initial-scale=1",
   themeColor: "#3b82f6",

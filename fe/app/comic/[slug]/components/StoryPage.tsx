@@ -1,3 +1,4 @@
+// app/comic/[slug]/page.tsx
 "use client";
 
 import { useEffect, use } from "react";
@@ -30,6 +31,7 @@ export default function StoryPage({ params }: StoryPageProps) {
     };
   }, [slug, dispatch]);
 
+  // Loading state
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-accent/10">
@@ -49,7 +51,8 @@ export default function StoryPage({ params }: StoryPageProps) {
     );
   }
 
-  if (error && error !== "null") {
+  // Error state
+  if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="container max-w-md">
@@ -79,12 +82,13 @@ export default function StoryPage({ params }: StoryPageProps) {
     );
   }
 
-  if (!storyDetail && !loading) {
+  // No data state
+  if (!storyDetail) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="container max-w-md">
           <Alert>
-            <AlertCircle className="h-4 w-4" />
+            <AlertCircle className="h-4 h-4" />
             <AlertTitle>Không tìm thấy truyện</AlertTitle>
             <AlertDescription>
               Truyện bạn đang tìm không tồn tại hoặc đã bị xóa.
@@ -100,5 +104,6 @@ export default function StoryPage({ params }: StoryPageProps) {
     );
   }
 
+  // Render main content
   return <StoryDetailView slug={slug} storyDetail={storyDetail} />;
 }

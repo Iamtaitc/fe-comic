@@ -6,19 +6,19 @@ import { BookOpen, TrendingUp, Clock } from "lucide-react";
 import { gsap } from 'gsap';
 import { getGradientBySlug } from "./GradientUtils";
 
-interface CategoryHeaderProps {
+interface DetailHeaderProps {
   title: string;
   description: string;
   totalStories: number;
   slug: string;
 }
 
-export function CategoryHeader({ 
+export function DetailHeader({ 
   title, 
   description, 
   totalStories, 
   slug 
-}: CategoryHeaderProps) {
+}: DetailHeaderProps) {
   const gradient = getGradientBySlug(slug);
   const cosmicFlowRef = useRef<HTMLDivElement>(null);
   const particlesRef = useRef<HTMLDivElement>(null);

@@ -3,8 +3,8 @@
 import { use, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchStoriesByCategory, resetCategoryState, setCurrentCategory } from "@/store/slices/categorySlice";
-import { CategoryHeader } from "@/components/category/CategoryHeader";
-import { CategoryStoryList } from "@/components/category/CategoryStoryList";
+import { CategoryHeader } from "@/components/detail/DetailHeader";
+import { CategoryStoryList } from "@/components/detail/DetailStoryList";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";

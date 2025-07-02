@@ -18,7 +18,6 @@ export interface StoryObject {
   slug: string;
   status: string;
   thumb_url: string;
-  category: CategoryObject[];
   views?: number;
   ratingValue: number;
   ratingCount: number;

@@ -1,3 +1,4 @@
+// StoryDetailView.tsx
 "use client";
 
 import Link from "next/link";
@@ -8,25 +9,11 @@ import ChapterList from "./ChapterList";
 import LazyImage from "@/components/LazyImage";
 import { Eye, Heart, Star, BookOpen, Calendar } from "lucide-react";
 import { useMemo } from "react";
+import { StoryDetailData } from "@/types/story";
 
 interface StoryDetailViewProps {
   slug: string;
-  storyDetail: {
-    story: {
-      name: string;
-      origin_name: string[];
-      content: string;
-      status: string;
-      thumb_url: string;
-      category: { _id: string; name: string; slug: string }[];
-      views: number;
-      likeCount: number;
-      ratingValue: number;
-      ratingCount: number;
-      chapters?: number | string;
-    };
-    chapters: number | string;
-  };
+  storyDetail: StoryDetailData;
 }
 
 interface StoryInfo {
@@ -63,7 +50,7 @@ export default function StoryDetailView({
       },
       {
         label: "Chương",
-        value: Array.isArray(chapters) ? chapters.length.toString() : "0",
+        value: chapters?.length?.toString() || "0",
         icon: <BookOpen className="w-4 h-4" />,
       },
     ],
@@ -86,15 +73,19 @@ export default function StoryDetailView({
   const statusVariant = useMemo(() => {
     switch (story.status) {
       case "ongoing":
-        return "default";
+        return "default" as const;
       case "completed":
-        return "secondary";
+        return "secondary" as const;
       case "paused":
-        return "destructive";
+        return "destructive" as const;
       default:
-        return "outline";
+        return "outline" as const;
     }
   }, [story.status]);
+
+  // Safe access to first and last chapters
+  const firstChapter = chapters?.[0];
+  const lastChapter = chapters?.[chapters.length - 1];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-accent/10">
@@ -177,26 +168,24 @@ export default function StoryDetailView({
                 asChild
                 size="lg"
                 className="flex-1"
-                disabled={!Array.isArray(chapters) || !chapters.length}
+                disabled={!firstChapter}
               >
                 <Link
-                  href={`/comic/${slug}/chapter/${
-                    Array.isArray(chapters) ? chapters[0]?.chapter_name : ""
-                  }`}
+                  href={
+                    firstChapter
+                      ? `/comic/${slug}/chapter/${firstChapter.chapter_name}`
+                      : "#"
+                  }
                 >
                   <BookOpen className="w-4 h-4 mr-2" />
                   Đọc từ đầu
                 </Link>
               </Button>
 
-              {Array.isArray(chapters) && chapters.length > 1 && (
+              {lastChapter && chapters.length > 1 && (
                 <Button asChild variant="outline" size="lg" className="flex-1">
                   <Link
-                    href={`/comic/${slug}/chapter/${
-                      Array.isArray(chapters)
-                        ? chapters[chapters.length - 1]?.chapter_name
-                        : ""
-                    }`}
+                    href={`/comic/${slug}/chapter/${lastChapter.chapter_name}`}
                   >
                     <Calendar className="w-4 h-4 mr-2" />
                     Đọc mới nhất
@@ -208,7 +197,7 @@ export default function StoryDetailView({
         </div>
 
         {/* Chapter List */}
-        {Array.isArray(chapters) && (
+        {chapters && chapters.length > 0 && (
           <ChapterList slug={slug} chapters={chapters} />
         )}
       </div>

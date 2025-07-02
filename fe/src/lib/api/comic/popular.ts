@@ -1,9 +1,9 @@
 import { apiClient } from '../client';
-import { StoryList } from './types';
+import { StoryListResponse } from './types';
 //done
 export async function getPopularStories(params: {
   page?: number;
   limit?: number;
-}): Promise<StoryList> {
+}): Promise<StoryListResponse> {
   return apiClient.get('/comics/popular', { params });
 }

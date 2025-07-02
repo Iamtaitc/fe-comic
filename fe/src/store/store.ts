@@ -4,6 +4,7 @@ import homeReducer from "./slices/homeSlice";
 import uiReducer from "./slices/uiSlice";
 import categoryReducer from "./slices/categorySlice";
 import storyReducer from "./slices/storySlice";
+import chapterReducer from "./slices/chapterSlice";
 import authReducer from "./slices/authSlice";
 
 export const makeStore = () => {
@@ -13,6 +14,7 @@ export const makeStore = () => {
       ui: uiReducer,
       category: categoryReducer,
       story: storyReducer,
+      chapter: chapterReducer,
       auth: authReducer,
     },
     devTools: process.env.NODE_ENV !== "production",

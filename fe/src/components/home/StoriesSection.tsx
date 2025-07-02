@@ -41,39 +41,39 @@ const defaultColumns = {
   mobile: 2,
   tablet: 3,
   desktop: 4,
-  large: 5
+  large: 5,
 };
 
 const animations = {
   title: {
     hidden: { opacity: 0, y: 8 },
-    show: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1] } 
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1] },
     },
   },
   button: {
     hidden: { opacity: 0, scale: 0.95 },
-    show: { 
-      opacity: 1, 
-      scale: 1, 
-      transition: { duration: 0.25, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] } 
+    show: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.25, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] },
     },
   },
   contentFade: {
     hidden: { opacity: 0, y: 20 },
-    show: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] } 
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] },
     },
-    exit: { 
-      opacity: 0, 
-      y: -20, 
-      transition: { duration: 0.3 } 
-    }
-  }
+    exit: {
+      opacity: 0,
+      y: -20,
+      transition: { duration: 0.3 },
+    },
+  },
 };
 
 export const StoriesSection = memo(function StoriesSection({
@@ -86,7 +86,7 @@ export const StoriesSection = memo(function StoriesSection({
   iconMotion,
   limit = 10,
   fetchAction,
-  columns = defaultColumns
+  columns = defaultColumns,
 }: StoriesSectionProps) {
   const dispatch = useAppDispatch();
   const { stories, loading, error, lastFetched } = useAppSelector(
@@ -145,17 +145,13 @@ export const StoriesSection = memo(function StoriesSection({
         )}
       </motion.h2>
 
-      <motion.div
-        variants={animations.button}
-        initial="hidden"
-        animate="show"
-      >
+      <motion.div variants={animations.button} initial="hidden" animate="show">
         <Button
           asChild
           variant="outline"
           size="sm"
           className={`border-none px-4 py-2 text-sm hover:text-red-200 md:px-6 transition-all ${
-            isInitialLoading ? 'opacity-50 pointer-events-none' : ''
+            isInitialLoading ? "opacity-50 pointer-events-none" : ""
           }`}
           disabled={isInitialLoading}
         >
@@ -195,7 +191,10 @@ export const StoriesSection = memo(function StoriesSection({
                 animate="show"
                 exit="exit"
               >
-                <LoadingSkeleton count={Math.min(limit, 10)} columns={columns} />
+                <LoadingSkeleton
+                  count={Math.min(limit, 10)}
+                  columns={columns}
+                />
               </motion.div>
             )}
 
@@ -208,7 +207,10 @@ export const StoriesSection = memo(function StoriesSection({
                 animate="show"
                 exit="exit"
               >
-                <Alert variant="destructive" className="bg-red-50 border-red-200">
+                <Alert
+                  variant="destructive"
+                  className="bg-red-50 border-red-200"
+                >
                   <AlertDescription className="text-sm">
                     {error}
                     <button
@@ -216,7 +218,7 @@ export const StoriesSection = memo(function StoriesSection({
                       className="ml-2 font-medium underline hover:no-underline transition-colors"
                       disabled={loading}
                     >
-                      {loading ? 'Đang thử lại...' : 'Thử lại'}
+                      {loading ? "Đang thử lại..." : "Thử lại"}
                     </button>
                   </AlertDescription>
                 </Alert>
@@ -250,8 +252,8 @@ export const StoriesSection = memo(function StoriesSection({
                 exit="exit"
                 className="relative"
               >
-                <StoriesGrid 
-                  stories={displayStories} 
+                <StoriesGrid
+                  stories={displayStories}
                   columns={columns}
                   animate={true}
                   showPriority={true}
