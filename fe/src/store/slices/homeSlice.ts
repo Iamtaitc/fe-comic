@@ -2,7 +2,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   StoryObject,
-  CategoryObject,
   HomeState,
   StorySection,
   CACHE_TIME,

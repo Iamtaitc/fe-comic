@@ -143,13 +143,12 @@ export default function OngoingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-accent/10">
+      
       <DetailHeader
         title={categoryInfo.title}
         description={categoryInfo.description}
         totalStories={pagination.totalStories}
         slug="ongoing"
-        icon={<Clock className="h-8 w-8 text-blue-500" />}
-        gradient="bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500"
       />
 
       <DetailFilters

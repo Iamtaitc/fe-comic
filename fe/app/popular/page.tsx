@@ -53,23 +53,26 @@ export default function PopularPage() {
 
       switch (filters.sortBy) {
         case "name":
-          comparison = a.name.localeCompare(b.name, 'vi');
+          comparison = a.name.localeCompare(b.name, "vi");
           break;
         case "rating":
           comparison = (b.ratingValue || 0) - (a.ratingValue || 0);
           break;
         case "views":
-          comparison = (b.viewCount || 0) - (a.viewCount || 0);
-          break;
-        case "latest":
-          comparison = new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+          comparison = (b.views || 0) - (a.views || 0);
           break;
         case "popular":
-        default:
-          // Popular có thể dựa trên rating + views
-          const scoreA = (a.ratingValue || 0) * 0.7 + (a.viewCount || 0) * 0.3;
-          const scoreB = (b.ratingValue || 0) * 0.7 + (b.viewCount || 0) * 0.3;
+          // Popular score = rating * 0.6 + views * 0.4
+          const scoreA = (a.ratingValue || 0) * 0.6 + (a.views || 0) * 0.4;
+          const scoreB = (b.ratingValue || 0) * 0.6 + (b.views || 0) * 0.4;
           comparison = scoreB - scoreA;
+          break;
+        case "latest":
+        default:
+          // Latest = updatedAt desc (khi nào hoàn thành)
+          comparison =
+            new Date(b.updatedAt ?? "").getTime() -
+            new Date(a.updatedAt ?? "").getTime();
           break;
       }
 
@@ -143,8 +146,6 @@ export default function PopularPage() {
         description={categoryInfo.description}
         totalStories={pagination.totalStories}
         slug="popular"
-        icon={<Flame className="h-8 w-8 text-red-500" />}
-        gradient="bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500"
       />
       
       <DetailFilters

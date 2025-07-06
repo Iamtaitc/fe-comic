@@ -144,7 +144,7 @@ export default function DetailFilters({
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center gap-4">
             <span>
-              <strong className="text-foreground">{totalStories.toLocaleString()}</strong> truyện
+              <strong className="text-foreground">{totalStories}</strong> truyện
             </span>
             
             {/* Active Filters */}
