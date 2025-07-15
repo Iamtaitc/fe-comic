@@ -1,28 +1,65 @@
-// lib/api/story/service.ts - Chỉ cho Story Detail
-import { apiClient } from '../../client';
-import { StoryDetailResponse } from '@/types/story';
+// lib/api/comic/story-detail/service.ts - Clean & Type-Safe
+import { apiClient } from "../../client";
+import { StoryDetailResponse, StoryDetailData } from "@/types/story";
 
-export async function getStoryDetail(slug: string): Promise<StoryDetailResponse> {
+// Type cho response có thể có nhiều structure
+type ApiResponse = StoryDetailResponse | StoryDetailData;
+
+export async function getStoryDetail(
+  slug: string
+): Promise<StoryDetailResponse> {
   try {
-    const response = await apiClient.get(`/comics/${slug}`);
-    console.log("Story Detail API Response:", response.data);
-    
-    if (!response.data?.success) {
-      throw new Error(response.data?.message || 'Không thể tải thông tin truyện');
+    if (!slug?.trim()) {
+      throw new Error("Slug không hợp lệ");
     }
-    
-    return response.data;
-  } catch (error: any) {
-    console.error("Story Detail API Error:", error);
-    
-    // Specific error handling for story detail
-    if (error.response?.status === 404) {
-      throw new Error('Không tìm thấy truyện này');
+
+    const response = (await apiClient.get(`/comics/${slug}`)) as
+      | { data?: ApiResponse }
+      | ApiResponse;
+
+    // ApiClient trả về data directly (đã có response interceptor)
+    const apiData =
+      typeof response === "object" && response !== null && "data" in response
+        ? (response as { data: ApiResponse }).data
+        : response;
+
+    // Normalize về đúng structure cho Redux
+    if ("story" in apiData) {
+      // Direct structure: { story, chapters, bookmark }
+      return {
+        success: true,
+        message: "Success",
+        data: apiData,
+        timestamp: new Date().toISOString(),
+      };
     }
-    if (error.response?.status === 403) {
-      throw new Error('Truyện này không được phép xem');
+
+    // Wrapped structure: { success, data: { story, chapters, bookmark } }
+    if (
+      typeof apiData === "object" &&
+      apiData !== null &&
+      "success" in apiData
+    ) {
+      if (!apiData.success) {
+        throw new Error(
+          (apiData as StoryDetailResponse).message || "API call failed"
+        );
+      }
+      if (!(apiData as StoryDetailResponse).data?.story) {
+        throw new Error("Missing story data");
+      }
+      return apiData as StoryDetailResponse;
     }
-    
-    throw new Error(error.message || 'Có lỗi xảy ra khi tải thông tin truyện');
+
+    throw new Error("Unexpected API response structure");
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    if (errorMessage.includes("404")) {
+      throw new Error("Không tìm thấy truyện này");
+    }
+
+    throw new Error(errorMessage);
   }
 }

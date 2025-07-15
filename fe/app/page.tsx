@@ -73,7 +73,7 @@ const StoriesSection = dynamic(
 );
 
 const TopWeeklyStories = dynamic(
-  () => import("@/components/TopWeeklyStories/TopWeeklyStoriesResponsive"),
+  () => import("@/components/TopWeeklyStories/TopWeeklyStories"),
   {
     loading: () => (
       <div className="py-12">
@@ -232,7 +232,7 @@ export default function HomePage() {
           </div>
         }
       >
-        <TopWeeklyStories stories={[]} deviceType="mobile" />
+        <TopWeeklyStories />
       </Suspense>
 
       <StoriesSection
@@ -286,29 +286,6 @@ export default function HomePage() {
             </motion.div>
           </div>
         </motion.div>
-      )}
-
-      {/* 🔧 Development Cache Info */}
-      {process.env.NODE_ENV === "development" && (
-        <div className="container py-4 px-4">
-          <details className="bg-gray-100 rounded-lg p-4">
-            <summary className="cursor-pointer font-medium text-sm text-gray-700">
-              🔍 Cache Debug Info ({cacheStatus.totalEntries} entries)
-            </summary>
-            <div className="mt-2 text-xs text-gray-600 space-y-1">
-              <div>Memory: {cacheStatus.memoryEntries} entries</div>
-              <div>LocalStorage: {cacheStatus.localStorageEntries} entries</div>
-              <div>Auto-refresh: Every 5 minutes</div>
-              <button
-                onClick={refreshAllData}
-                className="mt-2 px-3 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 transition-colors"
-                disabled={isAnyLoading}
-              >
-                Force Refresh All
-              </button>
-            </div>
-          </details>
-        </div>
       )}
     </motion.div>
   );

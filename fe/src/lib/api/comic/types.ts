@@ -138,3 +138,15 @@ export const isStoryObject = (obj: unknown): obj is StoryObject => {
 export const isValidStoryArray = (arr: unknown): arr is StoryObject[] => {
   return Array.isArray(arr) && arr.every(isStoryObject);
 };
+export const isValidTopWeeklyResponse = (
+  data: unknown
+): data is TopWeeklyResponse => {
+  return !!(
+    data &&
+    typeof data === "object" &&
+    "success" in data &&
+    "data" in data &&
+    (data as any).data?.stories &&
+    Array.isArray((data as any).data.stories)
+  );
+};
