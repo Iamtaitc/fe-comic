@@ -1,10 +1,8 @@
-
 // src/components/detail/DetailStoryList.tsx
 "use client";
 
 import { 
   DetailStoryListProps, 
-  InfiniteScrollConfig 
 } from "@/types/detail-story-list";
 import { 
   StoriesGridSkeleton, 

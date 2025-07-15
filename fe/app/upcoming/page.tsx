@@ -1,56 +1,143 @@
-//fe\app\upcoming\page.tsx
-"use client"
+// fe\app\upcoming\page.tsx - useState Pattern
+"use client";
 
-import { useEffect, useState } from "react"
-import { useAppDispatch, useAppSelector } from "@/store/hooks"
-import { fetchStoriesByCategory, resetCategoryState, setCurrentCategory } from "@/store/slices/categorySlice"
-import { CategoryHeader } from "@/components/detail/DetailHeader"
-import CategoryFilters from "@/components/detail/DetailFilters"
-import { CategoryStoryList } from "@/components/detail/DetailStoryList"
-import { Calendar } from "lucide-react"
+import { useState, useEffect, useCallback } from "react";
+import { getUpcomingStories } from "@/lib/api/comic/status";
+import { DetailHeader } from "@/components/detail/DetailHeader";
+import DetailFilters from "@/components/detail/DetailFilters";
+import { DetailStoryList } from "@/components/detail/DetailStoryList";
+import { StoryObject } from "@/lib/api/comic/types";
+
+type FilterState = {
+  status: "all" | "ongoing" | "completed" | "paused";
+  sortBy: "latest" | "popular" | "name" | "rating" | "views";
+  sortOrder: "asc" | "desc";
+};
 
 export default function UpcomingPage() {
-  const dispatch = useAppDispatch()
-  const { stories, loading, error, pagination, filters } = useAppSelector((state) => state.category)
-  const [categoryInfo] = useState({
-    title: "Truyện sắp ra mắt",
-    description: "Những bộ truyện mới sắp được phát hành, hãy theo dõi để không bỏ lỡ những tác phẩm hấp dẫn sắp tới.",
-  })
+  const [stories, setStories] = useState<StoryObject[]>([]);
+  const [totalStories, setTotalStories] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    pages: 1,
+    total: 0,
+    limit: 12,
+  });
 
+  const [filters, setFilters] = useState<FilterState>({
+    status: "all",
+    sortBy: "latest",
+    sortOrder: "desc",
+  });
+
+  // 🔧 Compact data extraction
+  const extractResponseData = (response: any) => {
+    const data = response?.data?.data || response?.data || response;
+    return {
+      stories: data.stories || [],
+      totalStories: data.totalStories || 0,
+      pagination: data.pagination || { page: 1, pages: 1, total: 0, limit: 12 },
+    };
+  };
+
+  // 🔧 Main fetch function
+  const fetchStories = useCallback(
+    async (pageNum = 1, append = false) => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const params = {
+          page: pageNum,
+          limit: pagination.limit,
+          sortBy: filters.sortBy,
+          sortOrder: filters.sortOrder,
+          ...(filters.status !== "all" && { status: filters.status }),
+        };
+
+        const response = await getUpcomingStories(params);
+        const { stories: newStories, totalStories: total, pagination: pag } = extractResponseData(response);
+
+        setStories(prev => append ? [...prev, ...newStories] : newStories);
+        setTotalStories(total);
+        setPagination(pag);
+
+        if (!newStories.length && !append) {
+          setError("Không có dữ liệu truyện từ API.");
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Lỗi khi tải truyện");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [filters, pagination.limit]
+  );
+
+  // 🔧 Effects
   useEffect(() => {
-    dispatch(resetCategoryState())
-    dispatch(setCurrentCategory("upcoming"))
-    dispatch(fetchStoriesByCategory({ slug: "upcoming" }))
+    fetchStories(1);
+  }, []);
+  useEffect(() => {
+    fetchStories(1);
+  }, [filters.status, filters.sortBy, filters.sortOrder]);
 
-    return () => {
-      dispatch(resetCategoryState())
+  // 🔧 Handlers
+  const handleFiltersChange = useCallback((newFilters: FilterState) => {
+    setFilters(newFilters);
+  }, []);
+
+  const handleRetry = useCallback(() => fetchStories(1), [fetchStories]);
+
+  const handleLoadMore = useCallback(async () => {
+    const hasNextPage = pagination.page < pagination.pages;
+    if (hasNextPage && !loading) {
+      await fetchStories(pagination.page + 1, true);
     }
-  }, [dispatch])
+  }, [pagination.page, pagination.pages, loading, fetchStories]);
+
+  const hasNextPage = pagination.page < pagination.pages;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-accent/10">
-      <CategoryHeader
-        title={categoryInfo.title}
-        description={categoryInfo.description}
-        totalStories={pagination.totalStories}
+      <DetailHeader
+        title="Truyện Sắp Ra Mắt"
+        description="Những bộ truyện mới sắp được phát hành, hãy theo dõi để không bỏ lỡ những tác phẩm hấp dẫn sắp tới."
+        totalStories={totalStories}
         slug="upcoming"
-        icon={<Calendar className="h-8 w-8 text-purple-500" />}
-        gradient="bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500"
       />
-      <CategoryFilters
+      
+      <DetailFilters
         filters={filters}
-        onFiltersChange={(newFilters) => dispatch(fetchStoriesByCategory({ slug: "upcoming", filters: newFilters }))}
-        totalStories={pagination.totalStories}
-        currentPage={pagination.currentPage}
-        totalPages={pagination.totalPages}
+        onFiltersChange={handleFiltersChange}
+        totalStories={totalStories}
+        currentPage={pagination.page}
+        totalPages={pagination.pages}
       />
-      <CategoryStoryList
+
+      <DetailStoryList
         stories={stories}
         loading={loading}
-        pagination={pagination}
+        pagination={{
+          currentPage: pagination.page,
+          totalPages: pagination.pages,
+          totalStories: totalStories,
+          hasNextPage: hasNextPage,
+          limit: pagination.limit,
+        }}
         categorySlug="upcoming"
         filters={filters}
+        error={error}
+        onRetry={handleRetry}
+        infiniteScroll={{
+          enabled: true,
+          threshold: 0.1,
+          rootMargin: "200px",
+          loadMoreHandler: handleLoadMore,
+        }}
       />
     </div>
-  )
+  );
 }

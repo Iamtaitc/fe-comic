@@ -11,7 +11,20 @@ export interface CategoryObject {
   slug: string;
   storyCount?: number;
 }
-
+export interface TopWeeklyResponse {
+  success: boolean;
+  message: string;
+  data: {
+    stories: StoryObject[];
+    period: {
+      start: string;
+      end: string;
+    };
+    lastUpdated: string;
+    computeTime: number;
+    totalStories: number;
+  };
+}
 export interface StoryObject {
   _id: string;
   name: string;

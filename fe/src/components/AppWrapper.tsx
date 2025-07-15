@@ -1,4 +1,4 @@
-// components/AppWrapper.tsx - Updated for existing layout structure
+// components/AppWrapper.tsx
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
@@ -14,37 +14,26 @@ export function AppWrapper({ children }: AppWrapperProps) {
   const [showGlobalLoading, setShowGlobalLoading] = useState(true);
   const [appReady, setAppReady] = useState(false);
 
-  // 🔑 Initialize home data with cache
   const { isInitializing, hasAnyData, debugInfo } = useHomeData({
     enableAutoRefresh: true,
-    refreshInterval: 5 * 60 * 1000, // 5 minutes
     debugMode: process.env.NODE_ENV === 'development'
   });
 
-  // 🔑 Handle loading completion
   const handleLoadingComplete = () => {
-    console.log('🎯 [AppWrapper] Global loading completed');
     setShowGlobalLoading(false);
     
-    // Small delay to ensure smooth transition
     setTimeout(() => {
       setAppReady(true);
     }, 100);
   };
 
-  // 🔑 Determine when to hide global loading
   useEffect(() => {
-    // Hide global loading when:
-    // 1. Data initialization is complete AND
-    // 2. We have some data (cached or fresh) OR
-    // 3. After maximum wait time (fallback)
     if (!isInitializing && (hasAnyData || !showGlobalLoading)) {
       const timer = setTimeout(handleLoadingComplete, 300);
       return () => clearTimeout(timer);
     }
   }, [isInitializing, hasAnyData, showGlobalLoading]);
 
-  // 🔑 Fallback timeout - always show app after 5 seconds
   useEffect(() => {
     const fallbackTimer = setTimeout(() => {
       if (showGlobalLoading) {
@@ -56,7 +45,6 @@ export function AppWrapper({ children }: AppWrapperProps) {
     return () => clearTimeout(fallbackTimer);
   }, [showGlobalLoading]);
 
-  // 🔑 Debug info
   useEffect(() => {
     if (debugInfo && process.env.NODE_ENV === 'development') {
       console.log('🔍 [AppWrapper] Debug Info:', debugInfo);
@@ -71,7 +59,6 @@ export function AppWrapper({ children }: AppWrapperProps) {
           <GlobalLoadingPage
             key="global-loading"
             onLoadingComplete={handleLoadingComplete}
-            minLoadingTime={2000} // Minimum 2 seconds for branding
           />
         )}
 

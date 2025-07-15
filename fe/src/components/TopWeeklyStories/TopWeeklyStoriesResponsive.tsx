@@ -77,7 +77,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     console.log("Server-side response:", JSON.stringify(response, null, 2)); // Debug log
 
-    if (!response.data?.success || !response.data?.data?.stories || !Array.isArray(response.data.data.stories)) {
+    if (!response.data?.stories || !Array.isArray(response.data.stories)) {
       return {
         props: {
           stories: [],
@@ -87,7 +87,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       };
     }
 
-    const stories = response.data.data.stories; // Lấy từ response.data.data.stories
+    const stories = response.data.stories; // Lấy từ response.data.stories
     const deviceType = parseUserAgent(context.req.headers["user-agent"] || "");
 
     return {
@@ -102,15 +102,23 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       props: {
         stories: [],
         deviceType: parseUserAgent(context.req.headers["user-agent"] || ""),
-        error: error instanceof Error ? error.message : "Không thể tải top truyện tuần",
+        error:
+          error instanceof Error
+            ? error.message
+            : "Không thể tải top truyện tuần",
       },
     };
   }
 };
 
 const parseUserAgent = (userAgent: string): "mobile" | "tablet" | "desktop" => {
-  const isMobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-  const isTablet = /Tablet|iPad|PlayBook|Silk|Kindle|Nexus 7|Nexus 10/i.test(userAgent);
+  const isMobile =
+    /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      userAgent
+    );
+  const isTablet = /Tablet|iPad|PlayBook|Silk|Kindle|Nexus 7|Nexus 10/i.test(
+    userAgent
+  );
 
   if (isTablet) return "tablet";
   if (isMobile) return "mobile";

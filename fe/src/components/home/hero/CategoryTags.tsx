@@ -4,10 +4,9 @@
 import { memo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { StoryObject } from "@/lib/api/comic/types";
 
 interface CategoryTagsProps {
-  categories: StoryObject['category'];
+  categories: Array<{ _id: string; name: string; slug: string }>;
   maxVisible?: number;
   className?: string;
 }
@@ -22,23 +21,23 @@ const tagAnimations = {
     transition: {
       delay: i * 0.1,
       duration: 0.3,
-      ease: [0.25, 0.1, 0.25, 1]
-    }
+      ease: [0.25, 0.1, 0.25, 1],
+    },
   }),
   hover: {
     scale: 1.05,
-    transition: { duration: 0.2 }
+    transition: { duration: 0.2 },
   },
   tap: {
     scale: 0.95,
-    transition: { duration: 0.1 }
-  }
+    transition: { duration: 0.1 },
+  },
 };
 
-export const CategoryTags = memo(function CategoryTags({ 
-  categories, 
+export const CategoryTags = memo(function CategoryTags({
+  categories,
   maxVisible = 3,
-  className = ""
+  className = "",
 }: CategoryTagsProps) {
   if (!categories?.length) {
     return null;
@@ -48,7 +47,9 @@ export const CategoryTags = memo(function CategoryTags({
   const remainingCount = categories.length - maxVisible;
 
   return (
-    <div className={`flex flex-wrap gap-2 justify-center lg:justify-start ${className}`}>
+    <div
+      className={`flex flex-wrap gap-2 justify-center lg:justify-start ${className}`}
+    >
       {/* Visible Category Tags */}
       {visibleCategories.map((category, index) => (
         <motion.div
@@ -82,7 +83,10 @@ export const CategoryTags = memo(function CategoryTags({
           animate="visible"
           className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium 
                      bg-white/10 text-white backdrop-blur-sm cursor-default"
-          title={`Còn ${remainingCount} thể loại khác: ${categories.slice(maxVisible).map(c => c.name).join(', ')}`}
+          title={`Còn ${remainingCount} thể loại khác: ${categories
+            .slice(maxVisible)
+            .map((c) => c.name)
+            .join(", ")}`}
         >
           +{remainingCount}
         </motion.div>
