@@ -1,35 +1,53 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Bật Strict Mode của React để phát hiện sớm các vấn đề tiềm ẩn
   reactStrictMode: true,
-
-  // Tắt header "x-powered-by: Next.js" để tăng cường bảo mật
   poweredByHeader: false,
-
-  // Cấu hình tối ưu hóa hình ảnh
+  
+  // 🚀 Optimized image configuration
   images: {
     domains: [
-      'localhost', // Cho môi trường development
-      'img.otruyenapi.com',
-      'sv1.otruyencdn.com',
+      "localhost",
+      "img.otruyenapi.com",
+      "sv1.otruyencdn.com",
     ],
-    formats: ['image/avif', 'image/webp'],
-  },
-
-  // Ví dụ về biến môi trường public
-  env: {
-    API_URL: process.env.API_URL, // Lấy giá trị từ file .env
-  },
-
-  // Ví dụ về redirect: khi người dùng vào /truyen-cu, sẽ được chuyển sang /truyen-moi
-  async redirects() {
-    return [
+    formats: ["image/webp", "image/avif"], // 🔧 WebP first, then AVIF
+    
+    // 🚀 Performance settings
+    minimumCacheTTL: 300, // 5 minutes cache
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920], // 🔧 Reduced sizes
+    imageSizes: [16, 32, 48, 64, 96, 128, 256], // 🔧 Optimized sizes
+    
+    // 🔧 Remote patterns (more secure than domains)
+    remotePatterns: [
       {
-        source: '/truyen-cu',
-        destination: '/truyen-moi',
-        permanent: true,
+        protocol: 'https',
+        hostname: 'sv1.otruyencdn.com',
+        pathname: '/uploads/**',
       },
-    ];
+      {
+        protocol: 'https',
+        hostname: 'img.otruyenapi.com',
+        pathname: '/**',
+      },
+    ],
+    
+    // 🚀 Disable for CDN images (they're already optimized)
+    unoptimized: false,
+  },
+  
+  // 🚀 Experimental optimizations
+  experimental: {
+    optimizePackageImports: ['lucide-react'],
+    optimizeCss: true, // 🔧 CSS optimization
+  },
+  
+  // 🔧 Compiler optimizations
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production", // 🚀 Remove console.log in production
+  },
+  
+  env: {
+    API_URL: process.env.API_URL,
   },
 };
 

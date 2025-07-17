@@ -1,4 +1,4 @@
-// components/LazyImage.tsx
+// components/LazyImage.tsx - Enhanced for manga
 "use client";
 
 import React, { useState, useEffect, memo } from "react";
@@ -15,6 +15,8 @@ interface LazyImageProps {
   sizes?: string; 
   width?: number;
   height?: number;
+  onLoad?: () => void;
+  onError?: () => void;
 }
 
 /**
@@ -31,22 +33,27 @@ const LazyImage = memo<LazyImageProps>(
     sizes,
     width,
     height,
+    onLoad,
+    onError,
   }) => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [hasError, setHasError] = useState<boolean>(false);
     const [currentSrc, setCurrentSrc] = useState<string>(src);
 
-    // --- Reset state khi src thay đổi ---
+    // Reset state khi src thay đổi
     useEffect(() => {
       setCurrentSrc(src);
       setIsLoading(true);
       setHasError(false);
     }, [src]);
 
-    const handleLoad = () => setIsLoading(false);
+    const handleLoad = () => {
+      setIsLoading(false);
+      onLoad?.();
+    };
 
     const handleError = () => {
-      // thử fallback nếu còn
+      // Thử fallback nếu còn
       if (currentSrc !== fallbackSrc) {
         setCurrentSrc(fallbackSrc);
         setIsLoading(true);
@@ -54,31 +61,51 @@ const LazyImage = memo<LazyImageProps>(
       } else {
         setIsLoading(false);
         setHasError(true);
+        onError?.();
       }
     };
 
-    // --- Helper tạo thẻ <Image> đúng props ---
+    // Render image với props đúng
     const renderImage = () => {
       const commonProps = {
         src: currentSrc,
         alt,
-        className: `object-cover transition-opacity duration-300 ${
+        className: `transition-opacity duration-300 ${
           isLoading ? "opacity-0" : "opacity-100"
         }`,
         priority: isEager,
         sizes,
         onLoad: handleLoad,
         onError: handleError,
+        quality: 95, // High quality for manga
       };
 
-      // Nếu có width & height → KHÔNG dùng fill
-      if (width && height) {
+      // 🔧 For manga pages - use natural dimensions
+      if (width === 0 && height === 0) {
         return (
-          <Image {...commonProps} width={width} height={height} alt={alt} />
+          <Image
+            {...commonProps}
+            width={0}
+            height={0}
+            style={{
+              width: '100%',
+              height: 'auto',
+              maxWidth: '100%',
+              display: 'block'
+            }}
+          />
         );
       }
 
-      return <Image {...commonProps} fill alt={alt} />;
+      // Fixed dimensions
+      if (width && height) {
+        return (
+          <Image {...commonProps} width={width} height={height} />
+        );
+      }
+
+      // Fill container
+      return <Image {...commonProps} fill className={`${commonProps.className} object-contain`} />;
     };
 
     return (
@@ -87,11 +114,26 @@ const LazyImage = memo<LazyImageProps>(
         style={{ aspectRatio }}
         aria-busy={isLoading}
       >
-        {isLoading && <Skeleton className="absolute inset-0 h-full w-full" />}
+        {/* Loading skeleton */}
+        {isLoading && (
+          <Skeleton className="absolute inset-0 h-full w-full min-h-[300px]" />
+        )}
 
+        {/* Error state */}
         {hasError ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground">
-            <span>Không thể tải hình ảnh</span>
+          <div className="flex flex-col items-center justify-center py-20 bg-gray-900 text-gray-400 min-h-[300px]">
+            <div className="text-3xl mb-2">🚫</div>
+            <p className="text-sm mb-2">Không thể tải hình ảnh</p>
+            <button
+              onClick={() => {
+                setCurrentSrc(src);
+                setIsLoading(true);
+                setHasError(false);
+              }}
+              className="px-3 py-1 bg-gray-700 rounded text-xs hover:bg-gray-600 transition-colors"
+            >
+              Thử lại
+            </button>
           </div>
         ) : (
           renderImage()

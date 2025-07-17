@@ -1,4 +1,4 @@
-// app/comic/[slug]/page.tsx
+// app\comic\[slug]\components\StoryPage.tsx
 "use client";
 
 import { useEffect, use } from "react";

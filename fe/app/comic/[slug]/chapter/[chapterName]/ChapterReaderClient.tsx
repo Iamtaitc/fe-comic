@@ -1,95 +1,101 @@
+// app/comic/[slug]/chapter/[chapterName]/ChapterPageClient.tsx - Clean version
 "use client";
 
-import { useEffect } from "react";
-import { useChapterReader } from "@/hooks/useChapterReader";
-import { useImageObserver } from "@/hooks/useImageObserver";
-import ChapterHeader from "@/components/comic/ChapterHeader";
-import ChapterContent from "@/components/comic/ChapterContent";
-import ChapterNavigation from "@/components/comic/ChapterNavigation";
-import ChapterInfo from "@/components/comic/ChapterInfo";
-import ErrorState from "@/components/comic/ErrorState";
-import LoadingState from "@/components/comic/LoadingState";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-interface ChapterReaderClientProps {
-  params: { 
-    slug: string; 
-    chapterName: string; 
+// Components
+import ChapterHeader from '@/components/comic/ChapterHeader';
+import ChapterContent from '@/components/comic/ChapterContent';
+import ChapterInfo from '@/components/comic/ChapterInfo';
+import ChapterNavigation from '@/components/comic/ChapterNavigation';
+import ErrorState from '@/components/comic/ErrorState';
+
+interface ChapterData {
+  success: boolean;
+  data: {
+    story: {
+      name: string;
+      slug: string;
+      thumb_url: string;
+    };
+    chapter: {
+      chapter_name: string;
+      chapter_title: string;
+      content: string[];
+      views: number;
+      likeCount: number;
+      createdAt: string;
+    };
+    navigation: {
+      prev?: { chapter_name: string };
+      next?: { chapter_name: string };
+    };
   };
-  initialChapter?: any;
-  initialError?: string;
 }
 
-export default function ChapterReaderClient({ 
-  params, 
-  initialChapter, 
-  initialError 
-}: ChapterReaderClientProps) {
-  const { slug, chapterName } = params;
-  
-  const {
-    chapter,
-    loading,
-    error,
-    goToNextChapter,
-    goToPrevChapter
-  } = useChapterReader({ slug, chapterName, initialChapter, initialError });
+interface Props {
+  initialData?: ChapterData;
+  slug: string;
+  chapterName: string;
+  error?: string;
+}
 
-  const { currentImageIndex, setCurrentImageIndex } = useImageObserver(
-    chapter?.chapter?.content?.length || 0
-  );
+export default function ChapterPageClient({ initialData, slug, chapterName, error }: Props) {
+  const router = useRouter();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    setCurrentImageIndex(0);
-  }, [slug, chapterName, setCurrentImageIndex]);
-
-  if ((loading && !chapter) || (!initialChapter && !error && !initialError)) {
-    return <LoadingState />;
+  // 🚨 Error handling
+  if (error || !initialData?.success) {
+    return <ErrorState error={error || "Không có dữ liệu"} slug={slug} />;
   }
 
-  if (error) {
-    return <ErrorState error={error} slug={slug} />;
-  }
-
-  if (!chapter?.chapter) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="text-white text-center">
-          <p>Không tìm thấy chapter</p>
-        </div>
-      </div>
-    );
-  }
-
-  const { chapter: chapterData, navigation } = chapter;
+  const { story, chapter, navigation } = initialData.data;
 
   return (
     <div className="min-h-screen bg-black text-white">
+      {/* Header */}
       <ChapterHeader
         slug={slug}
-        comicName={chapterData.comic_name}
-        chapterName={chapterData.chapter_name}
-        chapterTitle={chapterData.chapter_title}
+        comicName={story.name}
+        chapterName={chapter.chapter_name}
+        chapterTitle={chapter.chapter_title}
         currentImageIndex={currentImageIndex}
-        totalImages={chapterData.content?.length || 0}
+        totalImages={chapter.content.length}
       />
 
-      <ChapterContent content={chapterData.content || []} />
+      {/* Main content */}
+      <main>
+        <ChapterContent 
+          content={chapter.content}
+          onImageInView={setCurrentImageIndex}
+        />
+      </main>
 
+      {/* Chapter info */}
+      <ChapterInfo
+        comicName={story.name}
+        chapterName={chapter.chapter_name}
+        chapterTitle={chapter.chapter_title}
+        views={chapter.views}
+        likeCount={chapter.likeCount}
+        createdAt={chapter.createdAt}
+      />
+
+      {/* Navigation */}
       <ChapterNavigation
         slug={slug}
         navigation={navigation}
-        onPrevChapter={goToPrevChapter}
-        onNextChapter={goToNextChapter}
-      />
-
-      <ChapterInfo
-        comicName={chapterData.comic_name}
-        chapterName={chapterData.chapter_name}
-        chapterTitle={chapterData.chapter_title}
-        views={chapterData.views}
-        likeCount={chapterData.likeCount}
-        createdAt={chapterData.createdAt}
+        onPrevChapter={() => {
+          if (navigation.prev) {
+            router.push(`/comic/${slug}/chapter/${navigation.prev.chapter_name}`);
+          }
+        }}
+        onNextChapter={() => {
+          if (navigation.next) {
+            router.push(`/comic/${slug}/chapter/${navigation.next.chapter_name}`);
+          }
+        }}
       />
     </div>
   );

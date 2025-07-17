@@ -1,82 +1,49 @@
-// store/slices/chapterSlice.ts - Chỉ cho Chapter Reader
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getChapterDetail } from "@/lib/api/comic/chapter-detail/service";
-import { ChapterDetailData } from "@/types/chapter";
+// src/store/slices/chapterSlice.ts
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { ChapterDetailData } from '@/types/chapter';
 
 interface ChapterState {
-  chapterDetail: ChapterDetailData | null;
+  current?: ChapterDetailData;
   loading: boolean;
-  error: string | null;
-  // For chapter reader specific features
-  currentImageIndex: number;
-  readingMode: 'vertical' | 'horizontal';
-  zoomLevel: number;
+  error?: string;
 }
 
 const initialState: ChapterState = {
-  chapterDetail: null,
+  current: undefined,
   loading: false,
-  error: null,
-  currentImageIndex: 0,
-  readingMode: 'vertical',
-  zoomLevel: 1,
+  error: undefined,
 };
-
-export const fetchChapterDetail = createAsyncThunk(
-  "chapter/fetchDetail",
-  async ({ slug, chapterName }: { slug: string; chapterName: string }, { rejectWithValue }) => {
-    try {
-      const response = await getChapterDetail(slug, chapterName);
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
 
 const chapterSlice = createSlice({
   name: "chapter",
   initialState,
   reducers: {
-    resetChapterState: () => initialState,
-    setCurrentImageIndex: (state, action) => {
-      state.currentImageIndex = action.payload;
+    fetchStart(state) {
+      state.loading = true;
+      state.error = undefined;
     },
-    setReadingMode: (state, action) => {
-      state.readingMode = action.payload;
+    fetchSuccess(state, action: PayloadAction<ChapterDetailData>) {
+      state.current = action.payload;
+      state.loading = false;
     },
-    setZoomLevel: (state, action) => {
-      state.zoomLevel = action.payload;
+    fetchFailure(state, action: PayloadAction<string>) {
+      state.error = action.payload;
+      state.loading = false;
     },
-    clearChapterError: (state) => {
-      state.error = null;
+    clearChapter(state) {
+      state.current = undefined;
+      state.error = undefined;
+      state.loading = false;
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchChapterDetail.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchChapterDetail.fulfilled, (state, action) => {
-        state.loading = false;
-        state.chapterDetail = action.payload;
-        state.error = null;
-        state.currentImageIndex = 0; // Reset to first image
-      })
-      .addCase(fetchChapterDetail.rejected, (state, action) => {
-        state.loading = false;
-        state.chapterDetail = null;
-        state.error = action.payload as string;
-      });
   },
 });
 
-export const { 
-  resetChapterState, 
-  setCurrentImageIndex, 
-  setReadingMode, 
-  setZoomLevel,
-  clearChapterError 
+export const {
+  fetchStart,
+  fetchSuccess,
+  fetchFailure,
+  clearChapter,
 } = chapterSlice.actions;
+
+// ✅ export reducer as default
 export default chapterSlice.reducer;

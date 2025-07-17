@@ -1,4 +1,4 @@
-// StoryDetailView.tsx
+// app\comic\[slug]\components\StoryDetailView.tsx
 "use client";
 
 import Link from "next/link";
